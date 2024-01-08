@@ -77,7 +77,7 @@ def start_chat():
             print("\nChatbot: " + random.choice(responses[user_input]))
         elif user_input == "options":
             get_options()
-        elif user_input == "2":
+        elif user_input == "1":
             get_stocks_report()
         elif user_input == "help":
             get_help()

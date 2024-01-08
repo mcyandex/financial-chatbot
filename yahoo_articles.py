@@ -141,6 +141,22 @@ TF-IDF Score : C'est le produit de TF et IDF.
 vectorizer = TfidfVectorizer()
 tfidf_matrix = vectorizer.fit_transform(preprocessed_bdd)
 
+def generateResponse(user_input):
+  # Append the user input to the list of data sentences
+  preprocessed_bdd.append(user_input)
+
+  # Calculate the cosine similarity matrix
+  cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+  # Find the most similar sentence to the user input
+  most_similar_index = cosine_sim[len(preprocessed_bdd)-1].argsort()[-2]
+
+  # If the most similar sentence is not identical to the user input, return that sentence as the bot's response
+  if cosine_sim[len(preprocessed_bdd)-1][most_similar_index] != 1:
+      return preprocessed_bdd[most_similar_index]
+  else:
+      return "I am sorry, I could not understand you."
+
 feature_names = vectorizer.get_feature_names_out()
 for i, document in enumerate(preprocessed_bdd):
     print(f"Document {i + 1}: {document}")
