@@ -218,7 +218,7 @@ def main():
         user_response = input("User: ")
         if user_response == "q" :
             return
-        keywords = ["revenus", "transports", "nourritures", "sorties", "coûts"]
+        keywords = ["revenus", "transports", "nourritures", "sorties", "coûts", "épargne"]
         if any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
         if question == "As-tu des charges variables cette année ?" :
