@@ -271,4 +271,3 @@ def get_stocks_report():
     calculate_score(filename)
     print('\nChatbot: Report uploaded successfully !')
 
-get_stocks_report()
