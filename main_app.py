@@ -72,7 +72,7 @@ def start_chat():
     )
     get_options()
     input_count = 0
-    user_input = st.text_input(f"\nYou {input_count}: ").lower()
+    user_input = st.text_input(f"\n{input_count} You : ").lower()
     if st.button("Ask"):
         input_count += 1
         if user_input in responses:
