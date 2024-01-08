@@ -18,7 +18,5 @@ df = pd.DataFrame()
 for ticker in tickers:
     df = get_ticker_history(ticker, date, df)
 
-df.drop(df.columns[0], axis=1, inplace=True)
-df = df.rename(columns={'index': 'date'})
-df.to_csv('ticker_history.csv', index=False)
-df = pd.read_csv('ticker_history.csv')
+print(df.columns)
+print(df.head)
