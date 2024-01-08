@@ -3,8 +3,7 @@ import numpy as np
 
 # Ask questions and store responses
 questions = [
-    "As-tu des revenus fixes ?",
-    "Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)",
+    "A combien s'élèvent tes revenus fixes nets par mois ?",
     "Charges liées aux transports par mois ?",
     "Charges liées aux nourritures par mois ?",
     "Charges liées aux sorties par mois ?",
@@ -30,11 +29,11 @@ def get_charges_variables(user_responses):
 
 def montant_dispo_investir(user_responses):
     epargne = int(user_responses.get("Combien d'épargne disponible as-tu ? (mettre une valeur numérique)")) if user_responses.get("Combien d'épargne disponible as-tu ? (mettre une valeur numérique)", 0) else 0
-    fixe = int(user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
+    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
     return (epargne - fixe)
 
 def capacite_investissement_mois(user_responses):
-    fixe = int(user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
+    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
     transport = int(user_responses.get("Charges liées aux transports par mois ?", 0)) if user_responses.get("Charges liées aux transports par mois ?", 0) else 0
     nourritures = int(user_responses.get("Charges liées aux nourritures par mois ?", 0)) if user_responses.get("Charges liées aux nourritures par mois ?", 0) else 0
     sorties = int(user_responses.get("Charges liées aux sorties par mois ?", 0)) if user_responses.get("Charges liées aux sorties par mois ?", 0) else 0
@@ -46,9 +45,11 @@ def capacite_investissement_an(user_responses):
     mois = capacite_investissement_mois(user_responses)
     return (mois*12)
 
-def calculer_revenues_et_charges(charges_variables, user_responses):
+def calculer_revenues_et_charges(user_responses):
+    charges_variables = user_responses.get("As-tu des charges variables cette année ?")
+
     revenus = []
-    fixe = int(user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0)) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
+    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0)) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
     revenus = [fixe] * len(months)
     
     charges = []
@@ -87,8 +88,8 @@ def calculer_revenues_et_charges(charges_variables, user_responses):
             charges[11] += charge_value
     return revenus, charges
 
-def plot_repartitions_par_mois(charges_variables, user_responses):
-    revenus, charges = calculer_revenues_et_charges(charges_variables, user_responses)
+def plot_repartitions_par_mois(user_responses):
+    revenus, charges = calculer_revenues_et_charges(user_responses)
 
     # Adjust bar width and spacing
     bar_width = 0.35
@@ -117,8 +118,8 @@ def plot_repartitions_par_mois(charges_variables, user_responses):
     # Display the bar chart
     plt.show()
 
-def plot_repartition_capacite_invest(charges_variables, user_responses):
-    revenus, charges = calculer_revenues_et_charges(charges_variables, user_responses)
+def plot_repartition_capacite_invest(user_responses):
+    revenus, charges = calculer_revenues_et_charges(user_responses)
     capacite = []
     for i in range(len(revenus)):
         capacite.append(revenus[i] - charges[i])
@@ -146,8 +147,10 @@ def plot_repartition_capacite_invest(charges_variables, user_responses):
     # Display the bar chart
     plt.show()
 
-def plot_camembert(user_responses,charges_variables):
-    revenus, charges_non = calculer_revenues_et_charges(charges_variables, user_responses)
+def plot_camembert(user_responses):
+    charges_variables = user_responses.get("As-tu des charges variables cette année ?")
+
+    revenus, charges_non = calculer_revenues_et_charges(user_responses)
     total_revenus = sum(revenus)
 
     charges = []
@@ -181,25 +184,63 @@ print("\nRésumé des informations collectées :")
 for question, response in user_responses.items():
     print(f"{question}: {response}")"""
 
+def check_integer(user_response, question):
+    if user_response == "":
+        return 0
+    try:
+        user_response = int(user_response)
+        return user_response
+    except ValueError:
+        print("Error: Please enter a valid integer.")
+        while True:
+            try:
+                user_response = int(input(f"Chatbot: {question}"))
+                return user_response
+            except ValueError:
+                print("Error: Please enter a valid integer.")
+
+def check_string(user_response, question):
+    if type(user_response) == str:
+        return user_response
+    print("Error: Please enter a valid string.")
+    while True:
+        try:
+            user_response = int(input(f"Chatbot: {question}"))
+            return user_response
+        except ValueError:
+            print("Error: Please enter a valid string.")
+        
+
 #Interaction with the user
 def main():
-    while True :
-        for question in questions:
-            print(f"Chatbot: {question}")
-            user_response = input("User: ")
-            #stock the users answer to that question in a dictionary
-            user_responses[question] = user_response
-            if question == "As-tu des charges variables cette année ?" and user_response.lower() == "oui":
-                charges_variables = get_charges_variables(user_responses)
-        return charges_variables
-    
+    for question in questions:
+        print(f"Chatbot: {question}")
+        user_response = input("User: ")
+        if user_response == "q" :
+            return
+        keywords = ["revenus", "transports", "nourritures", "sorties", "coûts"]
+        if any(keyword in question.lower() for keyword in keywords):                
+            user_responses[question] = check_integer(user_response, question)
+        if question == "As-tu des charges variables cette année ?" :
+            print(user_response)
+            print("lol")
+            user_responses[question] = check_string(user_response, question)
+            try: 
+                if user_response.lower() == "non" or user_response == "" :
+                    user_responses[question] = {}
+                else :
+                    user_responses[question] = get_charges_variables(user_responses)
+            except ValueError:
+                # If conversion fails, print an error message and continue the loop
+                print("Error: Please enter a valid string.")
+        
 #Metrics
-charges_variables = main()
+main()
 print("Ta réserve de secours : ", int(user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0)
 print("Montant disponible à investir : ",montant_dispo_investir(user_responses))
 print("Ta capacité d'investissements par mois : ", capacite_investissement_mois(user_responses))
 print("Ta capacité d'investissements par an : ", capacite_investissement_an(user_responses))
-print(plot_repartitions_par_mois(charges_variables, user_responses))
-print(plot_repartition_capacite_invest(charges_variables, user_responses))
-print(plot_camembert(user_responses,charges_variables))
+print(plot_repartitions_par_mois(user_responses))
+print(plot_repartition_capacite_invest(user_responses))
+print(plot_camembert(user_responses))
 
