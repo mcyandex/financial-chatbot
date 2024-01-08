@@ -176,10 +176,10 @@ def plot_camembert(user_responses,charges_variables):
     plt.title('Distribution of Charges and Capacité d\'Investissement')
     plt.show()
 
-# Display collected information
+"""# Display collected information
 print("\nRésumé des informations collectées :")
 for question, response in user_responses.items():
-    print(f"{question}: {response}")
+    print(f"{question}: {response}")"""
 
 #Interaction with the user
 def main():
