@@ -100,6 +100,3 @@ def start_chat():
             st.write("\nChatbot: Goodbye! Until next time.")
         else:
             st.write("\nChatbot: I don't understand. Can you rephrase your question?")
-
-if __name__ == "__main__":
-    start_chat()
