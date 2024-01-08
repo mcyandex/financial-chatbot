@@ -9,6 +9,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import xlwings as xw
 import warnings
+import streamlit as st
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -31,7 +32,7 @@ def get_moning_ticker(stock):
         moning_ticker = action_soup.find_all('div', id='stocks-list')[0].find('a')['href'].rsplit('/', 1)[-1]
         return moning_ticker
     except (IndexError) as e:
-        print('Ticker not found')
+        st.write('Ticker not found')
 
 def get_yahoo_ticker(stock):
     try:
@@ -40,7 +41,7 @@ def get_yahoo_ticker(stock):
         yahoo_ticker = df[df['Name'].str.lower().str.contains(stock) & df['Name'].notna()]['Ticker'].iloc[0]
         return yahoo_ticker  
     except (IndexError) as e:
-        print('Ticker not found')
+        st.write('Ticker not found')
 
 def get_sub_elements(tab):
     return [element.text for element in tab]
@@ -242,15 +243,15 @@ def calculate_score(filename):
     workbook.save(filename)
     workbook = openpyxl.load_workbook(filename)
 
-    #print(workbook['Valeur Intrasèque']['E4'].value)
+    #st.write(workbook['Valeur Intrasèque']['E4'].value)
 
     app = xw.App(visible=True)
     wb = xw.Book(filename)
-    #print(filename)
+    #st.write(filename)
     worksheet = wb.sheets['Valeur Intrasèque']
-    #print(worksheet.range('E4').value, type(worksheet.range('E4').value))
+    #st.write(worksheet.range('E4').value, type(worksheet.range('E4').value))
     val_intraseque = (worksheet.range('E4').value + worksheet.range('F4').value + worksheet.range('G4').value) / 3
-    #print(f'valeur intras {val_intraseque} + {worksheet.range("E4").value}')
+    #st.write(f'valeur intras {val_intraseque} + {worksheet.range("E4").value}')
     wb.close()
     app.quit()
 
@@ -262,12 +263,13 @@ def calculate_score(filename):
 
 def get_stocks_report():
     global yahoo_ticker, moning_ticker
-    print('\nChatbot: Enter stock name to analyze')
-    stock_name = input('\nYou: ')
-    yahoo_ticker = get_yahoo_ticker(stock_name)
-    moning_ticker = get_moning_ticker(stock_name)
-    create_report(yahoo_ticker)
-    import_data(filename)
-    calculate_score(filename)
-    print('\nChatbot: Report uploaded successfully !')
+    st.write('\nChatbot: Enter stock name to analyze')
+    stock_name = st.text_input("You: ", "")
+    if st.button("Create report"):
+        yahoo_ticker = get_yahoo_ticker(stock_name)
+        moning_ticker = get_moning_ticker(stock_name)
+        create_report(yahoo_ticker)
+        import_data(filename)
+        calculate_score(filename)
+        st.write('\nChatbot: Report uploaded successfully !')
 
