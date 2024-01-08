@@ -71,21 +71,35 @@ def start_chat():
         "\nChatbot: Hello, I am your Financial Advisor Bot. Feel free to ask me any questions related to personal finance:"
     )
     get_options()
-    input_count = 0
-    user_input = st.text_input(f"\n{input_count} You : ").lower()
-    if st.button("Ask"):
-        input_count += 1
+
+    user_inputs = []  # List to store user inputs
+    input_counter = 0
+
+    user_input = st.text_input(f"{input_counter + 1}. \nYou: ").lower()
+
+    ask_button = st.button("Ask")
+
+    if ask_button and user_input:
+        input_counter += 1
+        user_inputs.append(user_input)
+        st.write(input_counter)
+
+        for i, (input_text, output_text) in enumerate(zip(user_inputs, responses.get(user_input, []))):
+            st.write(f"\nYou {i + 1}: {input_text}")
+            st.write(f"Chatbot {i + 1}: {output_text}")
+
         if user_input in responses:
-                st.write("\nChatbot: " + random.choice(responses[user_input]))
+            st.write("\nChatbot: " + random.choice(responses[user_input]))
         elif user_input == "options":
-                get_options()
+            get_options()
         elif user_input == "2":
-                get_stocks_report()
+            get_stocks_report()
         elif user_input == "help":
-                get_help()
+            get_help()
         elif user_input in exits:
-            st.write("\nChatbot: Goodbye! Until next time.")   
+            st.write("\nChatbot: Goodbye! Until next time.")
         else:
             st.write("\nChatbot: I don't understand. Can you rephrase your question?")
 
-start_chat()
+if __name__ == "__main__":
+    start_chat()
