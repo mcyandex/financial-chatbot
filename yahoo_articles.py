@@ -15,10 +15,6 @@ chatbot. Il peut s'agir de données sur un sujet spécifique, comme des faits g�
 un domaine particulier, etc
 """
 
-!pip install transformers[torch]
-!pip install -U accelerate
-!pip install -U transformers
-
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -283,7 +279,6 @@ trainer.train()
 eval_result = trainer.evaluate()
 print(eval_result)
 
-!pip install transformers[torch] accelerate
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
