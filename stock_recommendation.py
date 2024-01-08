@@ -8,7 +8,7 @@ df = pd.read_csv("ticker_history.csv")
 print(df.head)
 print(df.columns)
 # Combine relevant features into a single string
-df['Features'] = df[['open', 'high', 'low', 'close', 'ticker']].astype(str).agg(' '.join, axis=1)
+df['Features'] = df[['open', 'high', 'low', 'close']].astype(str).agg(' '.join, axis=1)
 # Vectorize these features using TF-IDF
 vectorizer = TfidfVectorizer(stop_words='english')
 tfidf_matrix = vectorizer.fit_transform(df['Features'])
