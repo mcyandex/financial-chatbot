@@ -221,7 +221,7 @@ def check_string(user_response, question):
         
 
 #Interaction with the user
-def main():
+def get_personal_finance():
     exit_conditions = ("q", "quit", "exit")
     print("Appuyer sur q / quit / exit pour quitter !")
     for question in questions:
@@ -243,14 +243,11 @@ def main():
             except ValueError:
                 # If conversion fails, print an error message and continue the loop
                 print("Error: Please enter a valid string.")
-        
-#Metrics
-main()
-print("Ta réserve de secours : ", int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0)
-print("Montant disponible à investir : ",montant_dispo_investir(user_responses))
-print("Ta capacité d'investissements par mois : ", capacite_investissement_mois(user_responses))
-print("Ta capacité d'investissements par an : ", capacite_investissement_an(user_responses))
-print(plot_repartitions_par_mois(user_responses))
-print(plot_repartition_capacite_invest(user_responses))
-print(plot_camembert(user_responses))
-
+    #Metrics
+    print("Ta réserve de secours : ", int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0)
+    print("Montant disponible à investir : ",montant_dispo_investir(user_responses))
+    print("Ta capacité d'investissements par mois : ", capacite_investissement_mois(user_responses))
+    print("Ta capacité d'investissements par an : ", capacite_investissement_an(user_responses))
+    print(plot_repartitions_par_mois(user_responses))
+    print(plot_repartition_capacite_invest(user_responses))
+    print(plot_camembert(user_responses))

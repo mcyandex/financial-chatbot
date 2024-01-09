@@ -1,18 +1,7 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import linear_kernel
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
- 
-df = pd.read_csv("./Data/ticker_history.csv", delimiter=';')
-print(df.head)
-print(df.columns)
-# Combine relevant features into a single string
-df['Features'] = df[['open', 'high', 'low', 'close','ticker']].astype(str).agg(' '.join, axis=1)
-# Vectorize these features using TF-IDF
-vectorizer = TfidfVectorizer(stop_words='english')
-tfidf_matrix = vectorizer.fit_transform(df['Features'])
- 
+  
 # Function to get item recommendations based on user input (date)
 def get_recommendations(date, ticker):
     #Finds the index of the first row where the user input date matches in the column Date
@@ -44,18 +33,25 @@ def display_recommended_dates(recommendations, ticker):
 #Example :
 #'08/12/2023'
 #"aapl"
-def chatbot():
+def get_stock_recommendation():
+    global df
+    df = pd.read_csv("./Data/ticker_history.csv", delimiter=';')
+    # Combine relevant features into a single string
+    df['Features'] = df[['open', 'high', 'low', 'close','ticker']].astype(str).agg(' '.join, axis=1)
+    # Vectorize these features using TF-IDF
+    vectorizer = TfidfVectorizer(stop_words='english')
+    global tfidf_matrix
+    tfidf_matrix = vectorizer.fit_transform(df['Features'])
     while True:
-        print("Please enter a date (MM/DD/YYYY) : ")
+        print("\nChatbot: Please enter a date (MM/DD/YYYY)\n")
         user_input_date = input()
-        print("Please enter a ticker : ")
+        print("\nChatbot: Please enter a ticker\n")
         ticker = input().upper()
         recommendations = get_recommendations(user_input_date, ticker)
-        print(f"User Input Date and Ticker: {user_input_date}, {ticker}")
-        print(f"Recommended Dates: {recommendations}")
+        print(f"\nUser Input Date and Ticker: {user_input_date}, {ticker}")
+        print(f"\nRecommended Dates: {recommendations}")
         print(display_recommended_dates(recommendations, ticker))
-        print("Do you want to continue? (yes/no): ")
+        print("\nChatbot: Do you want to continue? (yes/no): \n")
         response = input().lower()
         if response != 'yes':
-            break
-chatbot()        
+            break   
