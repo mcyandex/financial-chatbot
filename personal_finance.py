@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import streamlit as st
 
 # Ask questions and store responses
 questions = [
@@ -185,9 +186,9 @@ def plot_camembert(user_responses):
         return 
     
 """# Display collected information
-print("\nRésumé des informations collectées :")
+st.write("\nRésumé des informations collectées :")
 for question, response in user_responses.items():
-    print(f"{question}: {response}")"""
+    st.write(f"{question}: {response}")"""
 
 def check_integer(user_response, question):
     if user_response == "":
@@ -196,13 +197,13 @@ def check_integer(user_response, question):
         user_response = int(user_response)
         return user_response
     except ValueError:
-        print("Error: Please enter a valid integer.")
+        st.write("Error: Please enter a valid integer.")
         while True:
             try:
                 user_response = int(input(f"Chatbot: {question}"))
                 return user_response
             except ValueError:
-                print("Error: Please enter a valid integer.")
+                st.write("Error: Please enter a valid integer.")
 
 def check_string(user_response, question):
     if user_response == "":
@@ -211,29 +212,29 @@ def check_string(user_response, question):
         if user_response.lower() == "oui" or user_response.lower() == "non":
             return user_response
     except ValueError:
-        print("Error: Please enter either 'oui' or 'non'.")
+        st.write("Error: Please enter either 'oui' or 'non'.")
         while True:
             try:
                 user_response = str(input(f"Chatbot: {question}"))
                 return user_response
             except ValueError:
-                print("Error: Please enter either 'oui' or 'non'.")
+                st.write("Error: Please enter either 'oui' or 'non'.")
         
 
 #Interaction with the user
 def get_personal_finance():
     exit_conditions = ("q", "quit", "exit")
-    print("Appuyer sur q / quit / exit pour quitter !")
+    st.write("Appuyer sur q / quit / exit pour quitter !")
     for question in questions:
         keywords = ["revenus", "transports", "nourritures", "sorties", "coûts", "épargne"]
-        print(f"Chatbot: {question}")
+        st.write(f"Chatbot: {question}")
         user_response = input("User: ")
         if user_response in exit_conditions:
             return
         elif any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
         elif question == "As-tu des charges variables cette année ?" :
-            #print(user_response)
+            #st.write(user_response)
             user_responses[question] = check_string(user_response, question)
             try: 
                 if user_response.lower() == "non" or user_response == "" :
@@ -241,13 +242,13 @@ def get_personal_finance():
                 else :
                     user_responses[question] = get_charges_variables(user_responses)
             except ValueError:
-                # If conversion fails, print an error message and continue the loop
-                print("Error: Please enter a valid string.")
+                # If conversion fails, st.write an error message and continue the loop
+                st.write("Error: Please enter a valid string.")
     #Metrics
-    print("Ta réserve de secours : ", int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0)
-    print("Montant disponible à investir : ",montant_dispo_investir(user_responses))
-    print("Ta capacité d'investissements par mois : ", capacite_investissement_mois(user_responses))
-    print("Ta capacité d'investissements par an : ", capacite_investissement_an(user_responses))
-    print(plot_repartitions_par_mois(user_responses))
-    print(plot_repartition_capacite_invest(user_responses))
-    print(plot_camembert(user_responses))
+    st.write("Ta réserve de secours : ", int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0)
+    st.write("Montant disponible à investir : ",montant_dispo_investir(user_responses))
+    st.write("Ta capacité d'investissements par mois : ", capacite_investissement_mois(user_responses))
+    st.write("Ta capacité d'investissements par an : ", capacite_investissement_an(user_responses))
+    st.write(plot_repartitions_par_mois(user_responses))
+    st.write(plot_repartition_capacite_invest(user_responses))
+    st.write(plot_camembert(user_responses))

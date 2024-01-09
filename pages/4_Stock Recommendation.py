@@ -10,4 +10,4 @@ chatbot_model = pipeline("conversational")
 st.title("Investing Recommendation")
 st.write("Welcome to the Investing Recommendation page!")
 
-chatbot()
+get_stock_recommendation()

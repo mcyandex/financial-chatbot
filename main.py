@@ -53,23 +53,23 @@ exits = ["q", "quit", "exit", "bye"]
 
 
 def get_options():
-    print("\nChatbot: Here some of my functionalities")
-    print("1) Stocks Consulting")
-    print("2) Personal Finance")
-    print("3) Question Answering with Yahoo Articles")
-    print("4) Stocks Recommendation")
+    st.write("\nChatbot: Here some of my functionalities")
+    st.write("1) Stocks Consulting")
+    st.write("2) Personal Finance")
+    st.write("3) Question Answering with Yahoo Articles")
+    st.write("4) Stocks Recommendation")
 
 
 def get_help():
-    print("\nChatbot: Here list of commands you can use")
+    st.write("\nChatbot: Here list of commands you can use")
     for k in responses.keys():
-        print("- " + k)
-    print("- options")
-    print("- help")
+        st.write("- " + k)
+    st.write("- options")
+    st.write("- help")
 
 
 def start_chat():
-    print(
+    st.write(
         "\nChatbot: Hello, I am your Financial Advisor Bot. Feel free to ask me any questions related to personal finance:"
     )
     get_options()
@@ -77,7 +77,7 @@ def start_chat():
     while True:
         user_input = input("\nUser: ").lower()
         if user_input in responses:
-            print("\nChatbot: " + random.choice(responses[user_input]))
+            st.write("\nChatbot: " + random.choice(responses[user_input]))
         elif user_input == "options":
             get_options()
         elif user_input == "1":
@@ -91,9 +91,9 @@ def start_chat():
         elif user_input == "help":
             get_help()
         elif user_input in exits:
-            print("\nChatbot: Goodbye! Until next time.")
+            st.write("\nChatbot: Goodbye! Until next time.")
             break
         else:
-            print("\nChatbot: I don't understand. Can you rephrase your question?")
+            st.write("\nChatbot: I don't understand. Can you rephrase your question?")
 
 start_chat()
