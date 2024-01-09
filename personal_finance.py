@@ -46,7 +46,7 @@ def capacite_investissement_an(user_responses):
     return (mois*12)
 
 def calculer_revenues_et_charges(user_responses):
-    charges_variables = user_responses.get("As-tu des charges variables cette année ?")
+    charges_variables = user_responses.get("As-tu des charges variables cette année ?") if user_responses.get("As-tu des charges variables cette année ?", 0) else {}
 
     revenus = []
     fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0)) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0
@@ -60,32 +60,33 @@ def calculer_revenues_et_charges(user_responses):
     charges_total = (transport + nourritures + sorties + couts)
     charges += [charges_total] * len(months)
     #add charges variables
-    for month, charge in charges_variables.items():
-        charge_value = int(charge) if charge is not None and str(charge).strip() != '' else 0
-        if month == "janvier":
-            charges[0] += charge_value
-        elif month ==  "février":
-            charges[1] += charge_value
-        elif month == "mars":
-            charges[2] += charge_value
-        elif month == "avril":
-            charges[3] += charge_value
-        elif month == "mai":
-            charges[4] += charge_value
-        elif month == "juin":
-            charges[5] += charge_value
-        elif month == "juillet":
-            charges[6] += charge_value
-        elif month == "août":
-            charges[7] += charge_value
-        elif month == "septembre":
-            charges[8] += charge_value
-        elif month == "octobre":
-            charges[9] += charge_value
-        elif month == "novembre":
-            charges[10] += charge_value
-        else:
-            charges[11] += charge_value
+    if charges_variables != {}:
+        for month, charge in charges_variables.items():
+            charge_value = int(charge) if charge is not None and str(charge).strip() != '' else 0
+            if month == "janvier":
+                charges[0] += charge_value
+            elif month ==  "février":
+                charges[1] += charge_value
+            elif month == "mars":
+                charges[2] += charge_value
+            elif month == "avril":
+                charges[3] += charge_value
+            elif month == "mai":
+                charges[4] += charge_value
+            elif month == "juin":
+                charges[5] += charge_value
+            elif month == "juillet":
+                charges[6] += charge_value
+            elif month == "août":
+                charges[7] += charge_value
+            elif month == "septembre":
+                charges[8] += charge_value
+            elif month == "octobre":
+                charges[9] += charge_value
+            elif month == "novembre":
+                charges[10] += charge_value
+            else:
+                charges[11] += charge_value
     return revenus, charges
 
 def plot_repartitions_par_mois(user_responses):
@@ -148,7 +149,7 @@ def plot_repartition_capacite_invest(user_responses):
     plt.show()
 
 def plot_camembert(user_responses):
-    charges_variables = user_responses.get("As-tu des charges variables cette année ?")
+    charges_variables = user_responses.get("As-tu des charges variables cette année ?") if user_responses.get("As-tu des charges variables cette année ?", 0) else {}
 
     revenus, charges_non = calculer_revenues_et_charges(user_responses)
     total_revenus = sum(revenus)
@@ -164,9 +165,10 @@ def plot_camembert(user_responses):
     total_charges = sum(charges)
 
     charges_var = 0
-    for month, charge in charges_variables.items():
-        charge_value = int(charge) if charge is not None and str(charge).strip() != '' else 0
-        charges_var += charge_value
+    if charges_variables != {}:
+        for month, charge in charges_variables.items():
+            charge_value = int(charge) if charge is not None and str(charge).strip() != '' else 0
+            charges_var += charge_value
 
     capacite_investissement = total_revenus - total_charges - charges_var
 
@@ -220,15 +222,17 @@ def check_string(user_response, question):
 
 #Interaction with the user
 def main():
+    exit_conditions = ("q", "quit", "exit")
+    print("Appuyer sur q / quit / exit pour quitter !")
     for question in questions:
+        keywords = ["revenus", "transports", "nourritures", "sorties", "coûts", "épargne"]
         print(f"Chatbot: {question}")
         user_response = input("User: ")
-        if user_response == "q" :
+        if user_response in exit_conditions:
             return
-        keywords = ["revenus", "transports", "nourritures", "sorties", "coûts", "épargne"]
-        if any(keyword in question.lower() for keyword in keywords):                
+        elif any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
-        if question == "As-tu des charges variables cette année ?" :
+        elif question == "As-tu des charges variables cette année ?" :
             #print(user_response)
             user_responses[question] = check_string(user_response, question)
             try: 
