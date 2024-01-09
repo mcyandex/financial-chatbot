@@ -1,5 +1,6 @@
 import random
 from stocks_consulting import *
+from yahoo_articles import *
 
 responses = {
     "hello": [
@@ -51,10 +52,10 @@ exits = ["q", "quit", "exit", "bye"]
 
 def get_options():
     print("\nChatbot: Here some of my functionalities")
-    print("1) Stocks consulting")
-    print("2) Budget Recommendation")
-    print("3) Personal Finance Advice")
-    print("4) Investing Recommendation")
+    print("1) Stocks Consulting")
+    print("2) Personal Finance")
+    print("3) Question Answering with Yahoo Articles")
+    print("4) Stocks Recommendation")
 
 
 def get_help():
@@ -79,6 +80,8 @@ def start_chat():
             get_options()
         elif user_input == "1":
             get_stocks_report()
+        elif user_input == "3":
+            get_financial_advices()
         elif user_input == "help":
             get_help()
         elif user_input in exits:
