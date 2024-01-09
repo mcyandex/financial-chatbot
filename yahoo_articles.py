@@ -138,13 +138,13 @@ def get_following_sentences(user_input, best_article, num_following_sentences=5)
 def start_chatbot_yahoo():
    exit_conditions = ("q", "quit", "exit", 'bye')
    while True:
-       query = input("> ")
+       query = input("\nUser: ")
        if query in exit_conditions:
            break
        else:
            best_article = get_best_article(query)
            best_sentence = get_following_sentences(query, best_article)
-           print(f"🤖 {best_sentence}")
+           print(f"\nChatbot: {best_sentence}")
            preprocessed_bdd.pop()
 
 def get_financial_advices():
