@@ -1,6 +1,10 @@
 import random
 import streamlit as st
 from stocks_consulting import *
+import importlib
+
+# Assuming the page files are in the "pages" folder and have the same name as the page function
+pages_folder = "pages"
 
 responses = {
     "hello": [
@@ -52,10 +56,11 @@ exits = ["q", "quit", "exit", "bye"]
 
 def get_options():
     st.write("\nChatbot: Here some of my functionalities")
-    st.write("1) Stocks consulting")
-    st.write("2) Budget Recommendation")
-    st.write("3) Personal Finance Advice")
-    st.write("4) Investing Recommendation")
+    st.write("\nSelect the service that you want")
+    st.write("1) [Stocks consulting](stocks_page)")
+    st.write("2) [Budget Recommendation](budget_page)")
+    st.write("3) [Personal Finance Advice](personal_finance_page)")
+    st.write("4) [Investing Recommendation](investing_page)")
 
 
 def get_help():
@@ -64,39 +69,47 @@ def get_help():
         st.write("- " + k)
     st.write("- options")
     st.write("- help")
-
+def load_page(page_name):
+    module = importlib.import_module(f"{pages_folder}.{page_name}")
+    return module.page
 
 def start_chat():
     st.write(
-        "\nChatbot: Hello, I am your Financial Advisor Bot. Feel free to ask me any questions related to personal finance:"
+        "\nChatbot: Hello, I am your Financial Advisor Bot. Feel free to ask me any questions related to personal finance:" 
     )
-    get_options()
+    st.write(
+        "\n(Use the command 'help' to see all the possible command)" 
+    )
 
     user_inputs = []  # List to store user inputs
     input_counter = 0
 
-    user_input = st.text_input(f"{input_counter + 1}. \nYou: ").lower()
+    user_input = st.text_input(f"{input_counter + 1}. \nYou: ")
 
     ask_button = st.button("Ask")
 
     if ask_button and user_input:
         input_counter += 1
-        user_inputs.append(user_input)
+        user_inputs.append(user_input.lower())  # Convert input to lowercase
         st.write(input_counter)
 
         for i, (input_text, output_text) in enumerate(zip(user_inputs, responses.get(user_input, []))):
             st.write(f"\nYou {i + 1}: {input_text}")
             st.write(f"Chatbot {i + 1}: {output_text}")
 
-        if user_input in responses:
-            st.write("\nChatbot: " + random.choice(responses[user_input]))
-        elif user_input == "options":
+        user_input_lower = user_input.lower()
+        if user_input_lower in responses:
+            st.write("\nChatbot: " + random.choice(responses[user_input_lower]))
+        elif user_input_lower == "options":
             get_options()
-        elif user_input == "2":
-            get_stocks_report()
-        elif user_input == "help":
+        elif user_input_lower == "1":
+            # Change the page based on user input
+            selected_page_name = "stocks_page"
+            selected_page = load_page(selected_page_name)
+            selected_page()
+        elif user_input_lower == "help":
             get_help()
-        elif user_input in exits:
+        elif user_input_lower in exits:
             st.write("\nChatbot: Goodbye! Until next time.")
         else:
             st.write("\nChatbot: I don't understand. Can you rephrase your question?")
