@@ -29,11 +29,11 @@ def get_charges_variables(user_responses):
 
 def montant_dispo_investir(user_responses):
     epargne = int(user_responses.get("Combien d'épargne disponible as-tu ? (mettre une valeur numérique)")) if user_responses.get("Combien d'épargne disponible as-tu ? (mettre une valeur numérique)", 0) else 0
-    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
+    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0
     return (epargne - fixe)
 
 def capacite_investissement_mois(user_responses):
-    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
+    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0
     transport = int(user_responses.get("Charges liées aux transports par mois ?", 0)) if user_responses.get("Charges liées aux transports par mois ?", 0) else 0
     nourritures = int(user_responses.get("Charges liées aux nourritures par mois ?", 0)) if user_responses.get("Charges liées aux nourritures par mois ?", 0) else 0
     sorties = int(user_responses.get("Charges liées aux sorties par mois ?", 0)) if user_responses.get("Charges liées aux sorties par mois ?", 0) else 0
@@ -49,7 +49,7 @@ def calculer_revenues_et_charges(user_responses):
     charges_variables = user_responses.get("As-tu des charges variables cette année ?")
 
     revenus = []
-    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0)) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0
+    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0)) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0
     revenus = [fixe] * len(months)
     
     charges = []
@@ -174,11 +174,14 @@ def plot_camembert(user_responses):
     sizes = [charges_var, transport, nourritures, sorties, couts, total_charges, capacite_investissement]
     labels = ["Charges Variables", "Transport", "Nourritures", "Sorties", "Autres", "Charges", "Capacité d'Investissement"]
 
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
-    plt.axis('equal')  #Ensures that pie is drawn as a circle.
-    plt.title('Distribution of Charges and Capacité d\'Investissement')
-    plt.show()
-
+    if len(np.unique(sizes)) != 1 or np.unique(sizes)[0] != 0 :
+        plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+        plt.axis('equal')  #Ensures that pie is drawn as a circle.
+        plt.title('Distribution of Charges and Capacité d\'Investissement')
+        plt.show()
+    else:
+        return 
+    
 """# Display collected information
 print("\nRésumé des informations collectées :")
 for question, response in user_responses.items():
@@ -200,15 +203,19 @@ def check_integer(user_response, question):
                 print("Error: Please enter a valid integer.")
 
 def check_string(user_response, question):
-    if type(user_response) == str:
-        return user_response
-    print("Error: Please enter a valid string.")
-    while True:
-        try:
-            user_response = int(input(f"Chatbot: {question}"))
+    if user_response == "":
+        return "non"
+    try:
+        if user_response.lower() == "oui" or user_response.lower() == "non":
             return user_response
-        except ValueError:
-            print("Error: Please enter a valid string.")
+    except ValueError:
+        print("Error: Please enter either 'oui' or 'non'.")
+        while True:
+            try:
+                user_response = str(input(f"Chatbot: {question}"))
+                return user_response
+            except ValueError:
+                print("Error: Please enter either 'oui' or 'non'.")
         
 
 #Interaction with the user
@@ -222,8 +229,7 @@ def main():
         if any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
         if question == "As-tu des charges variables cette année ?" :
-            print(user_response)
-            print("lol")
+            #print(user_response)
             user_responses[question] = check_string(user_response, question)
             try: 
                 if user_response.lower() == "non" or user_response == "" :
@@ -236,7 +242,7 @@ def main():
         
 #Metrics
 main()
-print("Ta réserve de secours : ", int(user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)")) if user_responses.get("Si oui, combien reçois-tu net par mois ? (si non, appuie sur Enter)", 0) else 0)
+print("Ta réserve de secours : ", int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0)
 print("Montant disponible à investir : ",montant_dispo_investir(user_responses))
 print("Ta capacité d'investissements par mois : ", capacite_investissement_mois(user_responses))
 print("Ta capacité d'investissements par an : ", capacite_investissement_an(user_responses))
