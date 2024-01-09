@@ -57,10 +57,13 @@ exits = ["q", "quit", "exit", "bye"]
 def get_options():
     st.write("\nChatbot: Here some of my functionalities")
     st.write("\nSelect the service that you want")
-    st.write("1) [Stocks consulting](stocks_page)")
-    st.write("2) [Budget Recommendation](budget_page)")
-    st.write("3) [Personal Finance Advice](personal_finance_page)")
-    st.write("4) [Investing Recommendation](investing_page)")
+    st.write("1) [Stocks consulting](Stocks_consulting)")
+    st.write("2) [Personal Finance](Personal_Finance)")
+    st.write("3) [Yahoo articles](Yahoo_articles)")
+    st.write("4) [Stock Recommendation](Stock_Recommendation)")
+
+
+
 
 
 def get_help():
@@ -104,7 +107,7 @@ def start_chat():
             get_options()
         elif user_input_lower == "1":
             # Change the page based on user input
-            selected_page_name = "stocks_page"
+            selected_page_name = "1_Stocks consulting"
             selected_page = load_page(selected_page_name)
             selected_page()
         elif user_input_lower == "help":
