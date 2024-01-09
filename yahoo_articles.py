@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 """TP4.ipynb
 
@@ -16,29 +17,27 @@ un domaine particulier, etc
 """
 
 import re
+=======
+>>>>>>> 3c602b01e0c8e106c15b2df638d1ca4b17d83635
 import requests
 from bs4 import BeautifulSoup
-from lxml.html import fromstring
-from nltk.tokenize import sent_tokenize, word_tokenize
-import nltk
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-import string
-import random
-import numpy as np
+from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.cluster import KMeans
-import accelerate
-import transformers
+import numpy as np
 
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
+def get_yahoo_finance_articles(base_url, count=26):
+    """
+    Retrieves Yahoo Finance articles from the specified base URL.
 
-def get_yahoo_finance_articles(count=26):
-    base_url = "https://finance.yahoo.com/topic/personal-finance-news/"
+    Parameters:
+    - base_url (str): The base URL to fetch articles from.
+    - count (int): Number of articles to retrieve.
+
+    Returns:
+    - list: List of dictionaries containing article titles and links.
+    """
     response = requests.get(base_url)
 
     if response.status_code == 200:
@@ -78,13 +77,9 @@ def get_links(articles):
     links.append(article['link'])
   return links
 
-articles = get_yahoo_finance_articles()
-
-urls = get_links(articles)
-
 def get_paragraphs_text(soup):
    paragraphs = soup.find_all('p')
-   return [re.sub(r'[^a-zA-Z]', ' ', paragraph.text.lower()) for paragraph in paragraphs]
+   return [paragraph.text.lower() for paragraph in paragraphs]
 
 def extract_text_from_article(link):
     response = requests.get(link)
@@ -93,100 +88,68 @@ def extract_text_from_article(link):
     return text
 
 def parse_all_articles(links):
-  return [' '.join(extract_text_from_article(link)) for link in links]
-
-bdd = parse_all_articles(urls)
-
-bdd
-
-len(bdd)
-
-"""2. Prétraitement des Données :  
-a. Effectuez la tokenization sur votre base de données.  
-b. Appliquez la lemmatisation pour normaliser les mots.  
-c. Explorez quelques exemples de données prétraitées.
-"""
+  return ['.'.join(extract_text_from_article(link)) for link in links]
 
 def data_preprocessing(bdd):
   preprocessed_bdd = []
   for doc in bdd:
-    tokens = word_tokenize(doc)
+    tokens = sent_tokenize(doc)
     lemmatizer = WordNetLemmatizer()
     lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens]
     preprocessed_bdd.append(' '.join(lemmatized_tokens))
   return preprocessed_bdd
 
-preprocessed_bdd = data_preprocessing(bdd)
-preprocessed_bdd
+def get_best_article(user_input):
+  """
+    Finds the most similar preprocessed article to the user input.
 
-"""3. Représentation Vectorielle :  
-a. Comprenez le concept de TF-IDF (Term Frequency-Inverse Document Frequency).  
-b. Utilisez la méthode TF-IDF pour créer une représentation vectorielle de vos données textuelles.  
-c. Examinez quelques vecteurs TF-IDF générés.
+    Parameters:
+    - user_input (str): User's input.
 
-Concept de TF-IDF (Term Frequency-Inverse Document Frequency) :
-TF-IDF est une technique de pondération couramment utilisée en traitement du langage naturel et en recherche d'information. Elle vise à évaluer l'importance d'un terme dans un document relativement à une collection de documents. La pondération est calculée en multipliant la fréquence d'un terme (TF) par l'inverse de sa fréquence dans tous les documents (IDF).
-
-Term Frequency (TF) : Mesure la fréquence d'un terme dans un document particulier. C'est le nombre de fois où un terme apparaît divisé par le nombre total de termes dans le document.
-
-Inverse Document Frequency (IDF) : Mesure l'inverse de la fréquence du terme dans l'ensemble des documents. Cela permet de donner plus de poids aux termes rares et moins de poids aux termes fréquents.
-
-TF-IDF Score : C'est le produit de TF et IDF.
-"""
-
-vectorizer = TfidfVectorizer()
-tfidf_matrix = vectorizer.fit_transform(preprocessed_bdd)
-
-def generateResponse(user_input):
-  # Append the user input to the list of data sentences
+    Returns:
+    - str: The most similar preprocessed article or an error message.
+    """
   preprocessed_bdd.append(user_input)
 
-  # Calculate the cosine similarity matrix
-  cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+  vectorizer = TfidfVectorizer(stop_words='english')
+  tfidf_matrix = vectorizer.fit_transform(preprocessed_bdd)
 
-  # Find the most similar sentence to the user input
-  most_similar_index = cosine_sim[len(preprocessed_bdd)-1].argsort()[-2]
+  cosine_sim = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
+  most_similar_index = np.argmax(cosine_sim)
 
-  # If the most similar sentence is not identical to the user input, return that sentence as the bot's response
-  if cosine_sim[len(preprocessed_bdd)-1][most_similar_index] != 1:
+  # Check if the cosine similarity is less than 1 (indicating some similarity) and greater than 0.1 (considering a minimum threshold for similarity).
+  if cosine_sim[0][most_similar_index] < 1 and cosine_sim[0][most_similar_index] > 0.1:
       return preprocessed_bdd[most_similar_index]
   else:
       return "I am sorry, I could not understand you."
+  
+def get_following_sentences(user_input, best_article, num_following_sentences=5):
+    """
+    Finds the N most similar sentences following the best article.
 
-feature_names = vectorizer.get_feature_names_out()
-for i, document in enumerate(preprocessed_bdd):
-    print(f"Document {i + 1}: {document}")
-    for j, feature in enumerate(feature_names):
-        tfidf_value = tfidf_matrix[i, j]
-        if tfidf_value > 0:
-            print(f"  {feature}: {tfidf_value}")
-    print("="*40)
+    Parameters:
+    - user_input (str): User's input.
+    - best_article (str): The most similar preprocessed article.
+    - num_following_sentences (int): Number of following sentences to retrieve.
 
-for i, document in enumerate(preprocessed_bdd):
-    tfidf_values = tfidf_matrix[i, :].toarray()[0]
-    top5_indices = np.argsort(tfidf_values)[::-1][:5]
-    top5_words = [feature_names[index] for index in top5_indices]
-    print(f"Top 5 des mots les plus fréquents dans le document {i + 1}: {top5_words}")
+    Returns:
+    - str: The capitalized N most similar sentences or an error message.
+    """
+    best_article = best_article.split('.') 
+    best_article.append(user_input)
 
-total_tfidf_values = np.sum(tfidf_matrix, axis=0).A1
-top5_indices_total = np.argsort(total_tfidf_values)[::-1][:5]
-top5_words_total = [feature_names[index] for index in top5_indices_total]
-print(f"\nTop 5 des mots les plus fréquents sur l'ensemble des documents : {top5_words_total}")
+    vectorizer = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = vectorizer.fit_transform(best_article)
 
-"""4. Choix du Modèle NLP :  
-a. Choisissez un modèle NLP parmi les options populaires comme BERT, GPT, DistilBERT, etc.  
-b. Expliquez la raison de votre choix en fonction de votre cas d'utilisation.
+    cosine_sim = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
 
-Pour des articles financiers, où la compréhension contextuelle est cruciale et où les relations complexes entre les termes peuvent être importantes, BERT serait un choix solide. BERT excelle dans la compréhension contextuelle bidirectionnelle, ce qui est particulièrement utile pour saisir les nuances et le contexte spécifique aux domaines tels que la finance.
+    most_similar_index = np.argmax(cosine_sim)
 
-Les articles financiers peuvent souvent contenir des termes techniques, des acronymes, et des relations subtiles entre les entités, et BERT est bien adapté pour capturer ces informations. De plus, BERT peut être fine-tuné sur des tâches spécifiques liées à la finance, comme la classification de sentiments, l'extraction d'entités financières, etc.
+    following_indices = np.argsort(cosine_sim[0])[:-num_following_sentences-1:-1][1:]
 
-5. Entraînement du Modèle :  
-a. Divisez votre base de données en ensembles d'entraînement et de test.  
-b. Entraînez votre modèle NLP sur l'ensemble d'entraînement.  
-c. Évaluez les performances de votre modèle sur l'ensemble de test.
-"""
+    following_sentences = [best_article[i] for i in following_indices]
 
+<<<<<<< HEAD
 from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
 from sklearn.model_selection import train_test_split
 import torch
@@ -577,22 +540,32 @@ b. Utilisez le modèle NLP pour générer une réponse basée sur la similarité
 def start_chatbot():
 
    exit_conditions = (":q", "quit", "exit")
+=======
+    # Check if the cosine similarity is less than 1 (indicating some similarity) and greater than 0.1 (considering a minimum threshold for similarity).
+    if cosine_sim[0][most_similar_index] < 1 and cosine_sim[0][most_similar_index] > 0.1:
+        capitalized_sentences = [sentence.capitalize() for sentence in following_sentences]
+        return '. '.join(capitalized_sentences) + '.'
+    else:
+        return "I am sorry, I could not understand you."
+>>>>>>> 3c602b01e0c8e106c15b2df638d1ca4b17d83635
 
+def start_chatbot_yahoo():
+   exit_conditions = ("q", "quit", "exit", 'bye')
    while True:
-       query = input("> ")
-
+       query = input("\nUser: ")
        if query in exit_conditions:
            break
        else:
-           response = get_response(query) #get_response a implémenté
-           print(f"🤖 {response}")
+           best_article = get_best_article(query)
+           best_sentence = get_following_sentences(query, best_article)
+           print(f"\nChatbot: {best_sentence}")
+           preprocessed_bdd.pop()
 
-start_chatbot()
-
-"""7. Évaluation du Chatbot :  
-a. Posez plusieurs questions au chatbot et évaluez la qualité des réponses.  
-b. Proposez des améliorations possibles pour rendre le chatbot plus performant.
-
-Conclusion :   
-Résumez les principales étapes du processus de création du chatbot et discutez des défis rencontrés.
-"""
+def get_financial_advices():
+  articles = get_yahoo_finance_articles("https://finance.yahoo.com/topic/personal-finance-news/") + get_yahoo_finance_articles("https://finance.yahoo.com/") + get_yahoo_finance_articles("https://finance.yahoo.com/calendar/") + get_yahoo_finance_articles("https://finance.yahoo.com/topic/stock-market-news/")
+  urls = get_links(articles)
+  global bdd
+  bdd = parse_all_articles(urls)
+  global preprocessed_bdd
+  preprocessed_bdd = data_preprocessing(bdd)
+  start_chatbot_yahoo()
