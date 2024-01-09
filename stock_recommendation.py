@@ -48,7 +48,7 @@ def display_recommended_dates(recommendations, ticker):
 def chatbot():
     while True:
         st.write("Please enter a date (MM/DD/YYYY) : ")
-        user_input_date = st.text_input()
+        user_input_date = st.text_input(label="stock_recommand_input")
         st.write("Please enter a ticker : ")
         ticker = input().upper()
         recommendations = get_recommendations(user_input_date, ticker)
