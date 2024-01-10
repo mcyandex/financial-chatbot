@@ -69,4 +69,4 @@ def get_stock_recommendation():
         if response != "yes":
             restart = False
     
-get_stock_recommendation()
+#get_stock_recommendation()
