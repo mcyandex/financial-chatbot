@@ -223,13 +223,15 @@ def check_string(user_response, question):
 #Interaction with the user
 def get_personal_finance():
     exit_conditions = ("q", "quit", "exit")
-    st.write("Type q / quit / exit to exit the program.")
+    print("Type q / quit / exit to exit the program.")
+    print("Chatbot: Welcome to personal finance module !")
     for question in questions:
         keywords = ["income", "transportation", "food", "outing", "other", "savings"]
         st.write(f"Chatbot: {question}")
         user_response = input("User: ")
         if user_response in exit_conditions:
-            return
+            print("ATTENTION : QUITTING PERSONAL FINANCE !!")
+            return 
         elif any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
         elif question == "Do you have any variable costs this year?" :
@@ -244,10 +246,10 @@ def get_personal_finance():
                 # If conversion fails, st.write an error message and continue the loop
                 st.write("Error: Please enter a valid string.")
     #Metrics
-    st.write("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
-    st.write("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
-    st.write("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
-    st.write("Investment capacity (per year) : ", calculate_savings_per_year(user_responses))
-    st.write(plot_monthly_breakdown(user_responses))
-    st.write(plot_investment_capacity(user_responses))
-    st.write(plot_pie_chart(user_responses))
+    print("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
+    print("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
+    print("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
+    print("Investment capacity (per year) : ", calculate_savings_per_year(user_responses))
+    print(plot_monthly_breakdown(user_responses))
+    print(plot_investment_capacity(user_responses))
+    print(plot_pie_chart(user_responses))

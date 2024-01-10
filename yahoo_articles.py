@@ -7,6 +7,27 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import streamlit as st
 
+responses = {
+    "budgeting": [
+        "Budgeting is crucial for financial success. Have you set up a budget before?",
+        "Sure, let's talk about budgeting. Where would you like to start?",
+        "Budgeting is a key aspect of financial planning. How can I assist you with it?",
+    ],
+    "investment": [
+        "Investing can help grow your wealth. What specific questions do you have about investments?",
+        "Sure, let's discuss investments. What aspects are you interested in?",
+        "Investing wisely is important for financial goals. How can I guide you through it?",
+    ],
+    "retirement planning": [
+        "Retirement planning is essential for a secure future. What do you want to know about retirement planning?",
+        "Certainly, let's talk about retirement planning. What specific information are you looking for?",
+        "Planning for retirement is a smart move. How can I assist you in this process?",
+    ],
+    "default" : [
+        "I don't understand. Can you rephrase your question?"
+    ],
+}
+
 def get_yahoo_finance_articles(base_url, count=26):
     """
     Retrieves Yahoo Finance articles from the specified base URL.

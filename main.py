@@ -3,6 +3,17 @@ from stocks_consulting import *
 from yahoo_articles import *
 from personal_finance import *
 from stock_recommendation import *
+import nltk
+import random
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+nltk.download('punkt')
+nltk.download('stopwords')
+from string import punctuation
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
 responses = {
     "hello": [
@@ -32,68 +43,81 @@ responses = {
         "I can provide guidance on budgeting, investments, retirement planning, and more. Feel free to ask me any questions related to personal finance!",
         "You can ask me about budgeting strategies, investment tips, and retirement planning. How can I assist you today?",
     ],
-    "budgeting": [
-        "Budgeting is crucial for financial success. Have you set up a budget before?",
-        "Sure, let's talk about budgeting. Where would you like to start?",
-        "Budgeting is a key aspect of financial planning. How can I assist you with it?",
-    ],
-    "investment": [
-        "Investing can help grow your wealth. What specific questions do you have about investments?",
-        "Sure, let's discuss investments. What aspects are you interested in?",
-        "Investing wisely is important for financial goals. How can I guide you through it?",
-    ],
-    "retirement planning": [
-        "Retirement planning is essential for a secure future. What do you want to know about retirement planning?",
-        "Certainly, let's talk about retirement planning. What specific information are you looking for?",
-        "Planning for retirement is a smart move. How can I assist you in this process?",
-    ],
+    "personal finance" : get_personal_finance,
+    "stock recommendation": get_stock_recommendation,
+    "stocks history" : get_financial_advices,
+
+    "default" : "I don't understand. Can you rephrase your question?"
+    ,
 }
 
-exits = ["q", "quit", "exit", "bye"]
+def clean_text(text):
+    # Remove symbols and digits
+    clean_text = re.sub('[^a-zA-Z]', ' ', text)   
+    # Replace multiple spaces with a single space
+    clean_text = re.sub('\[.*?\]', ' ', clean_text)
+    return clean_text
 
+def preprocess_text(text):
+    text = clean_text(text)
+    stoplist = set(stopwords.words('english')+ list(punctuation))
+    #Word Tokenize
+    tokens = word_tokenize(text.lower())
+    #filter the list of tokens that are not in stoplist
+    filtered_tokens = [word for word in tokens if word.isalnum() and word not in stoplist]
+    #Lemmatization
+    lemmatizer = WordNetLemmatizer()
+    #lemmatize each token
+    filtered_tokens = [lemmatizer.lemmatize(word) for word in filtered_tokens]
+    #recreate a phrase with the preprocessed tokens 
+    return ' '.join(filtered_tokens)
+ 
+def generate_response(user_input):
+    preprocessed_input = preprocess_text(user_input)
+    
+    vectorizer = TfidfVectorizer()
+    #for each key in the responses dictionary, compute preprocessing and stock them in a list
+    key_vectors = [preprocess_text(key) for key in responses.keys()]
+    #add the preprocessed user input into this list of keys
+    key_vectors.append(preprocessed_input)
+ 
+    #create the tfidf matrix of these keys
+    tfidf_matrix = vectorizer.fit_transform(key_vectors)
+    #compute the similarity of the keys with the last element of the list (user input)
+    similarity_scores = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])[0]
+    #print(similarity_scores)
+    #get the best score from the list
+    best_match_index = similarity_scores.argmax()  
+    #find the key of the dict that is the closest to the user input  
+    matched_key = list(responses.keys())[best_match_index % len(responses)]
 
-def get_options():
-    st.write("\nChatbot: Here some of my functionalities")
-    st.write("1) Stocks Consulting")
-    st.write("2) Personal Finance")
-    st.write("3) Question Answering with Yahoo Articles")
-    st.write("4) Stocks Recommendation")
-
-
-def get_help():
-    st.write("\nChatbot: Here list of commands you can use")
-    for k in responses.keys():
-        st.write("- " + k)
-    st.write("- options")
-    st.write("- help")
-
+    #if the score is greater than 0.1 get the matched response
+    if similarity_scores[best_match_index] > 0.1:
+        response = responses[matched_key]
+        #if the response is a function, call it
+        if callable(response):
+            response()
+        else : 
+            response = random.choice(responses[matched_key])
+    #if the score is very bad, the program returns a default message
+    else:
+        response = responses["default"]
+    return response
 
 def start_chat():
     st.write(
         "\nChatbot: Hello, I am your Financial Advisor Bot. Feel free to ask me any questions related to personal finance:"
     )
-    get_options()
 
     while True:
-        user_input = st.text_input("\nUser: ").lower()
-        if user_input in responses:
-            st.write("\nChatbot: " + random.choice(responses[user_input]))
-        elif user_input == "options":
-            get_options()
-        elif user_input == "1":
-            get_stocks_report()
-        elif user_input == "2":
-            get_personal_finance()
-        elif user_input == "3":
-            get_financial_advices()
-        elif user_input == "4":
-            get_stock_recommendation()
-        elif user_input == "help":
-            get_help()
-        elif user_input in exits:
-            st.write("\nChatbot: Goodbye! Until next time.")
-            break
-        else:
-            st.write("\nChatbot: I don't understand. Can you rephrase your question?")
+        user_input = input("\nUser: ").lower()
 
+        if user_input.lower() in ['exit', 'bye', 'quit']:
+            print("\nChatbot: Goodbye! Until next time.")
+            break
+
+        #Generate response
+        bot_response = generate_response(user_input)
+        print("Chatbot:", bot_response)
+                    
 start_chat()
