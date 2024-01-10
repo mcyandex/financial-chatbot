@@ -57,9 +57,9 @@ def get_stock_recommendation():
                 print("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
                 return 
             elif "/" in user_response :
-                ticker = user_response.upper()
-            else:
                 date = user_response
+            else:
+                ticker = user_response.upper()
         recommendations = get_recommendations(date, ticker)
         print(f"\nUser Input Date and Ticker: {date}, {ticker}")
         print(f"\nRecommended Dates: {recommendations}")
@@ -67,6 +67,6 @@ def get_stock_recommendation():
         print("\nChatbot: Do you want to continue? (yes/no): \n")
         response = input().lower()
         if response != "yes":
-            restart == False
+            restart = False
     
 get_stock_recommendation()
