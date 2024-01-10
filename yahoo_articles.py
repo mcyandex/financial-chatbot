@@ -139,7 +139,7 @@ def get_following_sentences(user_input, best_article, num_following_sentences=5)
 def start_chatbot_yahoo():
    exit_conditions = ("q", "quit", "exit", 'bye')
    while True:
-       query = input("\nUser: ")
+       query = st.text_input("\nUser: ")
        if query in exit_conditions:
            break
        else:

@@ -47,12 +47,12 @@ def get_stock_recommendation():
         st.write("\nChatbot: Please enter a date (MM/DD/YYYY)\n")
         user_input_date = input()
         st.write("\nChatbot: Please enter a ticker\n")
-        ticker = input().upper()
+        ticker = st.text_input().upper()
         recommendations = get_recommendations(user_input_date, ticker)
         st.write(f"\nUser Input Date and Ticker: {user_input_date}, {ticker}")
         st.write(f"\nRecommended Dates: {recommendations}")
         st.write(display_recommended_dates(recommendations, ticker))
         st.write("\nChatbot: Do you want to continue? (yes/no): \n")
-        response = input().lower()
+        response = st.text_input().lower()
         if response != 'yes':
             break   
