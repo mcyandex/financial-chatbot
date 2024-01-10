@@ -47,23 +47,23 @@ def get_stock_recommendation():
     print("Type q / quit / exit to exit the program.")
     print("Chatbot: Welcome to the stock recommendation module !")
 
-    while True:
-        print("\nChatbot: Please enter a date (MM/DD/YYYY)\n")
-        user_input_date = input("User: ")
-        if user_input_date in exit_conditions :
+    questions= ["Chatbot: Please enter a date (MM/DD/YYYY)", "Chatbot: Please enter a ticker"]
+    for question in questions:
+        print(question)
+        user_response = input("User: ")
+        if user_response in exit_conditions:
             print("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
             return 
-        else :
-            print("\nChatbot: Please enter a ticker\n")
-            ticker = input("User: ").upper()
-            if ticker in exit_conditions:
-                print("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
-                return 
-        recommendations = get_recommendations(user_input_date, ticker)
-        print(f"\nUser Input Date and Ticker: {user_input_date}, {ticker}")
-        print(f"\nRecommended Dates: {recommendations}")
-        print(display_recommended_dates(recommendations, ticker))
-        print("\nChatbot: Do you want to continue? (yes/no): \n")
-        response = input().lower()
-        if response != 'yes':
-            break   
+        elif "/" in user_response :
+            ticker = user_response.upper()
+        else:
+            date = user_response
+    recommendations = get_recommendations(date, ticker)
+    print(f"\nUser Input Date and Ticker: {date}, {ticker}")
+    print(f"\nRecommended Dates: {recommendations}")
+    print(display_recommended_dates(recommendations, ticker))
+    print("\nChatbot: Do you want to continue? (yes/no): \n")
+    response = input().lower()
+    if response != 'yes':
+        return   
+get_stock_recommendation()
