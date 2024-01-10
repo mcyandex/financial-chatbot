@@ -4,127 +4,93 @@ import streamlit as st
 
 # Ask questions and store responses
 questions = [
-    "A combien s'élèvent tes revenus fixes nets par mois ?",
-    "Charges liées aux transports par mois ?",
-    "Charges liées aux nourritures par mois ?",
-    "Charges liées aux sorties par mois ?",
-    "Autres coûts fixes par mois ?",
-    "As-tu des charges variables cette année ?",
-    "Combien d'épargne disponible as-tu ? (mettre une valeur numérique)",
+    "How much is your net fixed income per month?",
+    "Transportation costs per month?",
+    "Food costs per month?",
+    "Outing expenses per month?",
+    "Other fixed costs per month?",
+    "Do you have any variable costs this year?",
+    "How much available savings do you have?",
 ]
 
 months = [
-    "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+    "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"
 ]
 
 #Dictionary to store each users answers to the according question
 user_responses = {}
 
-def get_charges_variables(user_responses):
+def get_variable_costs(user_responses):
     months_dict={}
     for m in months:
         resp = input(f"{m} : ")
         months_dict[m] = resp
-    user_responses["Charges variables par mois"] = months_dict
+    user_responses["Variable costs per month"] = months_dict
     return months_dict
 
-def montant_dispo_investir(user_responses):
-    epargne = int(user_responses.get("Combien d'épargne disponible as-tu ? (mettre une valeur numérique)")) if user_responses.get("Combien d'épargne disponible as-tu ? (mettre une valeur numérique)", 0) else 0
-    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0
-    return (epargne - fixe)
+def calculate_available_amount_to_invest(user_responses):
+    savings = int(user_responses.get("How much available savings do you have?")) if user_responses.get("How much available savings do you have?", 0) else 0
+    income = int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0
+    return (savings - income)
 
-def capacite_investissement_mois(user_responses):
-    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0
-    transport = int(user_responses.get("Charges liées aux transports par mois ?", 0)) if user_responses.get("Charges liées aux transports par mois ?", 0) else 0
-    nourritures = int(user_responses.get("Charges liées aux nourritures par mois ?", 0)) if user_responses.get("Charges liées aux nourritures par mois ?", 0) else 0
-    sorties = int(user_responses.get("Charges liées aux sorties par mois ?", 0)) if user_responses.get("Charges liées aux sorties par mois ?", 0) else 0
-    couts = int(user_responses.get("Autres coûts fixes par mois ?", 0)) if user_responses.get("Autres coûts fixes par mois ?", 0) else 0
-    charges = (transport + nourritures + sorties + couts)
-    return (fixe - charges)
+def calculate_savings_per_month(user_responses):
+    income = int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0
+    transportation_costs = int(user_responses.get("Transportation costs per month?", 0)) if user_responses.get("Transportation costs per month?", 0) else 0
+    food_costs = int(user_responses.get("Food costs per month?", 0)) if user_responses.get("Food costs per month?", 0) else 0
+    outing_expenses = int(user_responses.get("Outing expenses per month?", 0)) if user_responses.get("Outing expenses per month?", 0) else 0
+    other_costs = int(user_responses.get("Other fixed costs per month?", 0)) if user_responses.get("Other fixed costs per month?", 0) else 0
+    total_costs = (transportation_costs + food_costs + outing_expenses + other_costs)
+    return (income - total_costs)
 
-def capacite_investissement_an(user_responses):
-    mois = capacite_investissement_mois(user_responses)
-    return (mois*12)
+def calculate_savings_per_year(user_responses):
+    return (calculate_savings_per_month(user_responses) * 12)
 
-def calculer_revenues_et_charges(user_responses):
-    charges_variables = user_responses.get("As-tu des charges variables cette année ?") if user_responses.get("As-tu des charges variables cette année ?", 0) else {}
+def calculate_income_and_costs(user_responses):
+    variable_costs = user_responses.get("Do you have any variable costs this year?") if user_responses.get("Do you have any variable costs this year?", 0) else {}
 
-    revenus = []
-    fixe = int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0)) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0
-    revenus = [fixe] * len(months)
+    yearly_income = []
+    monthly_income = int(user_responses.get("How much is your net fixed income per month?", 0)) if user_responses.get("How much is your net fixed income per month?", 0) else 0
+    yearly_income = [monthly_income] * len(months)
     
-    charges = []
-    transport = int(user_responses.get("Charges liées aux transports par mois ?", 0)) if user_responses.get("Charges liées aux transports par mois ?", 0) else 0
-    nourritures = int(user_responses.get("Charges liées aux nourritures par mois ?", 0)) if user_responses.get("Charges liées aux nourritures par mois ?", 0) else 0
-    sorties = int(user_responses.get("Charges liées aux sorties par mois ?", 0)) if user_responses.get("Charges liées aux sorties par mois ?", 0) else 0
-    couts = int(user_responses.get("Autres coûts fixes par mois ?", 0)) if user_responses.get("Autres coûts fixes par mois ?", 0) else 0
-    charges_total = (transport + nourritures + sorties + couts)
-    charges += [charges_total] * len(months)
+    total_costs_per_year = []
+    transportation_costs = int(user_responses.get("Transportation costs per month?", 0)) if user_responses.get("Transportation costs per month?", 0) else 0
+    food_costs = int(user_responses.get("Food costs per month?", 0)) if user_responses.get("Food costs per month?", 0) else 0
+    outing_expenses = int(user_responses.get("Outing expenses per month?", 0)) if user_responses.get("Outing expenses per month?", 0) else 0
+    other_costs = int(user_responses.get("Other fixed costs per month?", 0)) if user_responses.get("Other fixed costs per month?", 0) else 0
+    total_costs = (transportation_costs + food_costs + outing_expenses + other_costs)
+    total_costs_per_year += [total_costs] * len(months)
     #add charges variables
-    if charges_variables != {}:
-        for month, charge in charges_variables.items():
-            charge_value = int(charge) if charge is not None and str(charge).strip() != '' else 0
-            if month == "janvier":
-                charges[0] += charge_value
-            elif month ==  "février":
-                charges[1] += charge_value
-            elif month == "mars":
-                charges[2] += charge_value
-            elif month == "avril":
-                charges[3] += charge_value
-            elif month == "mai":
-                charges[4] += charge_value
-            elif month == "juin":
-                charges[5] += charge_value
-            elif month == "juillet":
-                charges[6] += charge_value
-            elif month == "août":
-                charges[7] += charge_value
-            elif month == "septembre":
-                charges[8] += charge_value
-            elif month == "octobre":
-                charges[9] += charge_value
-            elif month == "novembre":
-                charges[10] += charge_value
+    if variable_costs != {}:
+        for month, costs in variable_costs.items():
+            monthly_costs = int(costs) if costs is not None and str(costs).strip() != '' else 0
+            if month == "january":
+                total_costs_per_year[0] += monthly_costs
+            elif month ==  "february":
+                total_costs_per_year[1] += monthly_costs
+            elif month == "march":
+                total_costs_per_year[2] += monthly_costs
+            elif month == "april":
+                total_costs_per_year[3] += monthly_costs
+            elif month == "may":
+                total_costs_per_year[4] += monthly_costs
+            elif month == "june":
+                total_costs_per_year[5] += monthly_costs
+            elif month == "july":
+                total_costs_per_year[6] += monthly_costs
+            elif month == "august":
+                total_costs_per_year[7] += monthly_costs
+            elif month == "september":
+                total_costs_per_year[8] += monthly_costs
+            elif month == "october":
+                total_costs_per_year[9] += monthly_costs
+            elif month == "november":
+                total_costs_per_year[10] += monthly_costs
             else:
-                charges[11] += charge_value
-    return revenus, charges
+                total_costs_per_year[11] += monthly_costs
+    return yearly_income, total_costs_per_year
 
-def plot_repartitions_par_mois(user_responses):
-    revenus, charges = calculer_revenues_et_charges(user_responses)
-
-    # Adjust bar width and spacing
-    bar_width = 0.35
-    index = np.arange(len(months))
-    # Plotting the grouped bar chart
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    revenus_bars = ax.bar(index - bar_width/4, revenus, bar_width/2, label='Revenues', color='green')
-    charges_bars = ax.bar(index + bar_width/4, charges, bar_width/2, label='Charges', color='red')
-
-    # Adding labels and title
-    ax.set_xlabel('Mois')
-    ax.set_ylabel('Montant (en EUR)')
-    ax.set_title('Distribution des Revenues et Charges par Mois')
-    ax.set_xticks(index)
-    ax.set_xticklabels(months)
-
-    # Adding totals on top of each bar
-    for bar, data in zip(revenus_bars, revenus):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50, str(data), ha='center', va='bottom')
-
-    for bar, data in zip(charges_bars, charges):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50, str(data), ha='center', va='bottom')
-
-    ax.legend()
-    # Display the bar chart
-    plt.show()
-
-def plot_repartition_capacite_invest(user_responses):
-    revenus, charges = calculer_revenues_et_charges(user_responses)
-    capacite = []
-    for i in range(len(revenus)):
-        capacite.append(revenus[i] - charges[i])
+def plot_monthly_breakdown(user_responses):
+    revenus, charges = calculate_income_and_costs(user_responses)
 
     # Adjust bar width and spacing
     bar_width = 0.35
@@ -132,63 +98,96 @@ def plot_repartition_capacite_invest(user_responses):
     # Plotting the grouped bar chart
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    capacite_bars = ax.bar(index - bar_width/4, revenus, bar_width/2, label='Capacité', color='green')
+    income_bars = ax.bar(index - bar_width/4, revenus, bar_width/2, label='Income', color='green')
+    costs_bars = ax.bar(index + bar_width/4, charges, bar_width/2, label='Costs', color='red')
 
     # Adding labels and title
-    ax.set_xlabel('Mois')
-    ax.set_ylabel('Montant (en EUR)')
-    ax.set_title('Capacité par Mois')
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Value (EUR)')
+    ax.set_title('Income and Costs Breakdown (per Month)')
     ax.set_xticks(index)
     ax.set_xticklabels(months)
 
     # Adding totals on top of each bar
-    for bar, data in zip(capacite_bars, capacite):
+    for bar, data in zip(income_bars, revenus):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50, str(data), ha='center', va='bottom')
+
+    for bar, data in zip(costs_bars, charges):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50, str(data), ha='center', va='bottom')
 
     ax.legend()
     # Display the bar chart
     plt.show()
 
-def plot_camembert(user_responses):
-    charges_variables = user_responses.get("As-tu des charges variables cette année ?") if user_responses.get("As-tu des charges variables cette année ?", 0) else {}
+def plot_investment_capacity(user_responses):
+    income, costs = calculate_income_and_costs(user_responses)
+    invest_capacity = []
+    for i in range(len(income)):
+        invest_capacity.append(income[i] - costs[i])
 
-    revenus, charges_non = calculer_revenues_et_charges(user_responses)
-    total_revenus = sum(revenus)
+    # Adjust bar width and spacing
+    bar_width = 0.35
+    index = np.arange(len(months))
+    # Plotting the grouped bar chart
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    charges = []
-    transport = int(user_responses.get("Charges liées aux transports par mois ?", 0)) if user_responses.get("Charges liées aux transports par mois ?", 0) else 0
-    nourritures = int(user_responses.get("Charges liées aux nourritures par mois ?", 0)) if user_responses.get("Charges liées aux nourritures par mois ?", 0) else 0
-    sorties = int(user_responses.get("Charges liées aux sorties par mois ?", 0)) if user_responses.get("Charges liées aux sorties par mois ?", 0) else 0
-    couts = int(user_responses.get("Autres coûts fixes par mois ?", 0)) if user_responses.get("Autres coûts fixes par mois ?", 0) else 0
-    charges_total = (transport + nourritures + sorties + couts)
-    charges += [charges_total] * len(months)
+    capacity_bars = ax.bar(index - bar_width/4, income, bar_width/2, label='Capacity', color='green')
 
-    total_charges = sum(charges)
+    # Adding labels and title
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Value (EUR)')
+    ax.set_title('Investment Capacity (per month)')
+    ax.set_xticks(index)
+    ax.set_xticklabels(months)
 
-    charges_var = 0
-    if charges_variables != {}:
-        for month, charge in charges_variables.items():
-            charge_value = int(charge) if charge is not None and str(charge).strip() != '' else 0
-            charges_var += charge_value
+    # Adding totals on top of each bar
+    for bar, data in zip(capacity_bars, invest_capacity):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50, str(data), ha='center', va='bottom')
 
-    capacite_investissement = total_revenus - total_charges - charges_var
+    ax.legend()
+    # Display the bar chart
+    plt.show()
+
+def plot_pie_chart(user_responses):
+    variable_costs = user_responses.get("Do you have any variable costs this year?") if user_responses.get("Do you have any variable costs this year?", 0) else {}
+
+    income, _ = calculate_income_and_costs(user_responses)
+    total_income = sum(income)
+
+    costs = []
+    transportation_costs = int(user_responses.get("Transportation costs per month?", 0)) if user_responses.get("Transportation costs per month?", 0) else 0
+    food_costs = int(user_responses.get("Food costs per month?", 0)) if user_responses.get("Food costs per month?", 0) else 0
+    outing_expenses = int(user_responses.get("Outing expenses per month?", 0)) if user_responses.get("Outing expenses per month?", 0) else 0
+    other_costs = int(user_responses.get("Other fixed costs per month?", 0)) if user_responses.get("Other fixed costs per month?", 0) else 0
+    total_costs = (transportation_costs + food_costs + outing_expenses + other_costs)
+    costs += [total_costs] * len(months)
+
+    total_costs = sum(costs)
+
+    costs_var = 0
+    if variable_costs != {}:
+        for month, cost in variable_costs.items():
+            cost_value = int(cost) if cost is not None and str(cost).strip() != '' else 0
+            costs_var += cost_value
+
+    invesment_capacity = total_income - total_costs - costs_var
 
     # Data for the pie chart
-    sizes = [charges_var, transport, nourritures, sorties, couts, total_charges, capacite_investissement]
-    labels = ["Charges Variables", "Transport", "Nourritures", "Sorties", "Autres", "Charges", "Capacité d'Investissement"]
+    sizes = [costs_var, transportation_costs, food_costs, outing_expenses, other_costs, total_costs, invesment_capacity]
+    labels = ["Variable", "Transportation", "Food", "Outing", "Other", "Total", "Investment Capacity"]
 
     if len(np.unique(sizes)) != 1 or np.unique(sizes)[0] != 0 :
         plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
         plt.axis('equal')  #Ensures that pie is drawn as a circle.
-        plt.title('Distribution of Charges and Capacité d\'Investissement')
+        plt.title('Distribution of Costs and Investment capacity')
         plt.show()
     else:
         return 
     
 """# Display collected information
-st.write("\nRésumé des informations collectées :")
-for question, response in user_responses.items():
-    st.write(f"{question}: {response}")"""
+st.write("\n Collected data :")
+for question, answer in user_responses.items():
+    st.write(f"{question}: {answer}")"""
 
 def check_integer(user_response, question):
     if user_response == "":
@@ -207,48 +206,48 @@ def check_integer(user_response, question):
 
 def check_string(user_response, question):
     if user_response == "":
-        return "non"
+        return "no"
     try:
-        if user_response.lower() == "oui" or user_response.lower() == "non":
+        if user_response.lower() == "yes" or user_response.lower() == "no":
             return user_response
     except ValueError:
-        st.write("Error: Please enter either 'oui' or 'non'.")
+        st.write("Error: Please enter either 'yes' or 'no'.")
         while True:
             try:
                 user_response = str(input(f"Chatbot: {question}"))
                 return user_response
             except ValueError:
-                st.write("Error: Please enter either 'oui' or 'non'.")
+                st.write("Error: Please enter either 'yes' or 'no'.")
         
 
 #Interaction with the user
 def get_personal_finance():
     exit_conditions = ("q", "quit", "exit")
-    st.write("Appuyer sur q / quit / exit pour quitter !")
+    st.write("Type q / quit / exit to exit the program.")
     for question in questions:
-        keywords = ["revenus", "transports", "nourritures", "sorties", "coûts", "épargne"]
+        keywords = ["income", "transportation", "food", "outing", "other", "savings"]
         st.write(f"Chatbot: {question}")
         user_response = input("User: ")
         if user_response in exit_conditions:
             return
         elif any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
-        elif question == "As-tu des charges variables cette année ?" :
+        elif question == "Do you have any variable costs this year?" :
             #st.write(user_response)
             user_responses[question] = check_string(user_response, question)
             try: 
-                if user_response.lower() == "non" or user_response == "" :
+                if user_response.lower() == "no" or user_response == "" :
                     user_responses[question] = {}
                 else :
-                    user_responses[question] = get_charges_variables(user_responses)
+                    user_responses[question] = get_variable_costs(user_responses)
             except ValueError:
                 # If conversion fails, st.write an error message and continue the loop
                 st.write("Error: Please enter a valid string.")
     #Metrics
-    st.write("Ta réserve de secours : ", int(user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?")) if user_responses.get("A combien s'élèvent tes revenus fixes nets par mois ?", 0) else 0)
-    st.write("Montant disponible à investir : ",montant_dispo_investir(user_responses))
-    st.write("Ta capacité d'investissements par mois : ", capacite_investissement_mois(user_responses))
-    st.write("Ta capacité d'investissements par an : ", capacite_investissement_an(user_responses))
-    st.write(plot_repartitions_par_mois(user_responses))
-    st.write(plot_repartition_capacite_invest(user_responses))
-    st.write(plot_camembert(user_responses))
+    st.write("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
+    st.write("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
+    st.write("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
+    st.write("Investment capacity (per year) : ", calculate_savings_per_year(user_responses))
+    st.write(plot_monthly_breakdown(user_responses))
+    st.write(plot_investment_capacity(user_responses))
+    st.write(plot_pie_chart(user_responses))
