@@ -42,11 +42,23 @@ def get_stock_recommendation():
     vectorizer = TfidfVectorizer(stop_words='english')
     global tfidf_matrix
     tfidf_matrix = vectorizer.fit_transform(df['Features'])
+
+    exit_conditions = ("q", "quit", "exit")
+    print("Type q / quit / exit to exit the program.")
+    print("Chatbot: Welcome to the stock recommendation module !")
+
     while True:
         print("\nChatbot: Please enter a date (MM/DD/YYYY)\n")
-        user_input_date = input()
-        print("\nChatbot: Please enter a ticker\n")
-        ticker = input().upper()
+        user_input_date = input("User: ")
+        if user_input_date in exit_conditions :
+            print("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
+            return 
+        else :
+            print("\nChatbot: Please enter a ticker\n")
+            ticker = input("User: ").upper()
+            if ticker in exit_conditions:
+                print("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
+                return 
         recommendations = get_recommendations(user_input_date, ticker)
         print(f"\nUser Input Date and Ticker: {user_input_date}, {ticker}")
         print(f"\nRecommended Dates: {recommendations}")

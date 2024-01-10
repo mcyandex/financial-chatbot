@@ -223,12 +223,14 @@ def check_string(user_response, question):
 def get_personal_finance():
     exit_conditions = ("q", "quit", "exit")
     print("Type q / quit / exit to exit the program.")
+    print("Chatbot: Welcome to personal finance module !")
     for question in questions:
         keywords = ["income", "transportation", "food", "outing", "other", "savings"]
         print(f"Chatbot: {question}")
         user_response = input("User: ")
         if user_response in exit_conditions:
-            return
+            print("ATTENTION : QUITTING PERSONAL FINANCE !!")
+            return 
         elif any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
         elif question == "Do you have any variable costs this year?" :
