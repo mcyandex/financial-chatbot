@@ -5,28 +5,11 @@ from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-import streamlit as st
+import torch
+from transformers import BertForQuestionAnswering, BertTokenizer
 
-responses = {
-    "budgeting": [
-        "Budgeting is crucial for financial success. Have you set up a budget before?",
-        "Sure, let's talk about budgeting. Where would you like to start?",
-        "Budgeting is a key aspect of financial planning. How can I assist you with it?",
-    ],
-    "investment": [
-        "Investing can help grow your wealth. What specific questions do you have about investments?",
-        "Sure, let's discuss investments. What aspects are you interested in?",
-        "Investing wisely is important for financial goals. How can I guide you through it?",
-    ],
-    "retirement planning": [
-        "Retirement planning is essential for a secure future. What do you want to know about retirement planning?",
-        "Certainly, let's talk about retirement planning. What specific information are you looking for?",
-        "Planning for retirement is a smart move. How can I assist you in this process?",
-    ],
-    "default" : [
-        "I don't understand. Can you rephrase your question?"
-    ],
-}
+model = BertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
+tokenizer = BertTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
 
 def get_yahoo_finance_articles(base_url, count=26):
     """
@@ -168,8 +151,53 @@ def start_chatbot_yahoo():
            best_sentence = get_following_sentences(query, best_article)
            st.write(f"\nChatbot: {best_sentence}")
            preprocessed_bdd.pop()
+  
+def get_best_context(question, articles):
+    #append question to the bdd
+    articles.append(question)
+    
+    #create instance of tfidf vectorizer
+    vectorizer = TfidfVectorizer()
+    #compute the tfidf matrix
+    tfidf_matrix = vectorizer.fit_transform(articles)
+    
+    #compute cos sim between the question and articles
+    similarities = cosine_similarity(tfidf_matrix[-1] , tfidf_matrix[:-1])
+    #get the best index of the answer that has the best cos sim
+    best_index = similarities.argmax()
+
+    #pop the question out of the bdd
+    articles.pop()
+
+    #retrieve the best answer
+    best_answer = articles[best_index]
+    return best_answer
+
+def generate_answer_bert(question, context, model, tokenizer):
+    #tokenize question and context with bert's tokenizer
+    inputs = tokenizer(question, context, return_tensors = 'pt', max_length = 512, truncation = True) #'pt' to return pytorch tensors. max length and trucation to control the input size
+    outputs = model(**inputs) #pass the input to the model to get start/end positions' probability
+    
+    start_scores = outputs.start_logits #extract the predictions for the start position
+    end_scores = outputs.end_logits #extract the predictions for the start position
+
+    answer_start = torch.argmax(start_scores) #retrieve the max arg of the start position where the proba is the highest
+    answer_end = torch.argmax(end_scores) + 1 #retrieve the max arg of the end position where the proba is the highest
+    answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][answer_start:answer_end])) #extract the answer with these positions
+
+    cleaned_answer = answer.replace("[CLS]" , "").replace("[SEP]" , "").strip() #remove some tokens used by bert
+
+    return cleaned_answer
+
+def get_final_answer(question , bdd):
+   best_context = get_best_context(question , bdd)
+   bert_answer = generate_answer_bert(question, best_context, model, tokenizer)
+
+   return bert_answer
 
 def get_financial_advices():
+  print("Type q / quit / exit to exit the program.")
+  print("Chatbot: Welcome to the yahoo articles module !")
   articles = get_yahoo_finance_articles("https://finance.yahoo.com/topic/personal-finance-news/") + get_yahoo_finance_articles("https://finance.yahoo.com/") + get_yahoo_finance_articles("https://finance.yahoo.com/calendar/") + get_yahoo_finance_articles("https://finance.yahoo.com/topic/stock-market-news/")
   urls = get_links(articles)
   global bdd

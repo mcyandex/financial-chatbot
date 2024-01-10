@@ -34,34 +34,40 @@ def display_recommended_dates(recommendations, ticker):
 #Example :
 #'08/12/2023'
 #"aapl"
-def get_stock_recommendation():
-    global df
-    df = pd.read_csv("./Data/ticker_history.csv", delimiter=';')
-    # Combine relevant features into a single string
-    df['Features'] = df[['open', 'high', 'low', 'close','ticker']].astype(str).agg(' '.join, axis=1)
-    # Vectorize these features using TF-IDF
-    vectorizer = TfidfVectorizer(stop_words='english')
-    global tfidf_matrix
-    tfidf_matrix = vectorizer.fit_transform(df['Features'])
+def get_stock_recommendation(): 
+    restart = True
+    while restart:
+        global df
+        df = pd.read_csv("./Data/ticker_history.csv", delimiter=';')
+        # Combine relevant features into a single string
+        df['Features'] = df[['open', 'high', 'low', 'close','ticker']].astype(str).agg(' '.join, axis=1)
+        # Vectorize these features using TF-IDF
+        vectorizer = TfidfVectorizer(stop_words='english')
+        global tfidf_matrix
+        tfidf_matrix = vectorizer.fit_transform(df['Features'])
 
-    exit_conditions = ("q", "quit", "exit")
-    print("Type q / quit / exit to exit the program.")
-    print("Chatbot: Welcome to the stock recommendation module !")
+        exit_conditions = ("q", "quit", "exit")
+        print("Type q / quit / exit to exit the program.")
+        print("Chatbot: Welcome to the stock recommendation module !")
 
-    while True:
-        print("\nChatbot: Please enter a date (MM/DD/YYYY)\n")
-        user_input_date = input("User: ")
-        if user_input_date in exit_conditions :
-            print("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
-            return 
-        else :
-            print("\nChatbot: Please enter a ticker\n")
-            ticker = input("User: ").upper()
-            if ticker in exit_conditions:
+        questions= ["Chatbot: Please enter a date (MM/DD/YYYY)", "Chatbot: Please enter a ticker"]
+        for question in questions:
+            print(question)
+            user_response = input("User: ")
+            if user_response in exit_conditions:
                 print("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
                 return 
-        recommendations = get_recommendations(user_input_date, ticker)
-        st.write(f"\nUser Input Date and Ticker: {user_input_date}, {ticker}")
-        st.write(f"\nRecommended Dates: {recommendations}")
-        st.write(display_recommended_dates(recommendations, ticker))
-        st.write("\nChatbot: Do you want to continue? (yes/no): \n")
+            elif "/" in user_response :
+                date = user_response
+            else:
+                ticker = user_response.upper()
+        recommendations = get_recommendations(date, ticker)
+        print(f"\nUser Input Date and Ticker: {date}, {ticker}")
+        print(f"\nRecommended Dates: {recommendations}")
+        print(display_recommended_dates(recommendations, ticker))
+        print("\nChatbot: Do you want to continue? (yes/no): \n")
+        response = input().lower()
+        if response != "yes":
+            restart = False
+    
+#get_stock_recommendation()

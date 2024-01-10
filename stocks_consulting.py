@@ -1,29 +1,20 @@
-from yahoo_fin.stock_info import *
+from datetime import *
 import pandas as pd
-import openpyxl
-import shutil
-import re
-import json
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
-import xlwings as xw
 import warnings
+<<<<<<< HEAD
 import streamlit as st
+=======
+from yahoofinancials import YahooFinancials
+>>>>>>> e77c1a6a5fc5060ac2a2097f6fbf3f46490475f5
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-filename = ''
-modele = 'Modele//Evaluer_une_action.xlsx'
 
-def get_connection(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-    else:
-        soup = 'none'
-    return soup
+def get_previous_day():
+    previous_day = str(date.today() - timedelta(days=1))
+    return previous_day
 
+<<<<<<< HEAD
 def get_moning_ticker(stock):
     try:
         stock = stock.lower()
@@ -42,235 +33,186 @@ def get_yahoo_ticker(stock):
         return yahoo_ticker  
     except (IndexError) as e:
         st.write('Ticker not found')
+=======
 
-def get_sub_elements(tab):
-    return [element.text for element in tab]
+def request_data(ticker):
+    yf = YahooFinancials(ticker)
+    data_income = yf.get_financial_stmts('annual', 'income')['incomeStatementHistory'][ticker]
+    data_cash = yf.get_financial_stmts('annual', 'cash')['cashflowStatementHistory'][ticker]
+    data_balance = yf.get_financial_stmts('annual', 'balance')['balanceSheetHistory'][ticker]
+    stock_history = \
+        yf.get_historical_price_data(start_date=get_previous_day(), end_date=str(date.today()), time_interval="daily")[
+            ticker]
+    return data_income, data_cash, data_balance, stock_history
+>>>>>>> e77c1a6a5fc5060ac2a2097f6fbf3f46490475f5
 
-def get_attributes(tab, attribute):
-    return [element[attribute] for element in tab]
-    
-def combine_tab(liste1, liste2):
-    liste = []
-    for i in range(len(liste1)):
-        tuple_combine = (liste1[i], liste2[i])
-        liste.append(tuple_combine)
-    return liste
 
-def extract_graph(soup, libelle):
-    liste = soup.find_all('canvas', id=libelle)[0]['data-graph']
+def get_most_recent_report(data):
+    all_dates = [key for dico in data for key in dico.keys()]
+    max_date = max(all_dates)
+    report_last_date = next((entry for entry in data if max_date in entry), None)[max_date]
+    return report_last_date
 
-    # Analyse de la chaîne JSON
-    data = json.loads(liste)
 
-    # Récupération d'un tuple (valeur, year) pour chaque objet
-    tuples = [(item["value"], item["year"]) for item in data]
+def get_turnover():
+    turnover = get_most_recent_report(data_income)['totalRevenue']
+    return str(round(turnover,2)) + " $"
 
-    # Créez un DataFrame à partir de la liste de tuples
-    df = pd.DataFrame(tuples, columns=['value', 'year'])
 
-    return df
+def get_free_cash_flow():
+    free_cash_flow = get_most_recent_report(data_cash)['freeCashFlow']
+    return str(round(free_cash_flow,2)) + " $"
 
-def copy_paste(workbook, copy_sheet, copy_cell, paste_sheet, paste_cell):
 
-    # Spécifiez la feuille d'origine et la cellule à copier
-    source_sheet_name = paste_sheet  # Remplacez par le nom de la feuille d'origine
-    source_cell = paste_cell  # Remplacez par la cellule d'origine que vous souhaitez copier
+def get_gross_margin():
+    turnover = get_most_recent_report(data_income)['totalRevenue']
+    gross_profit = get_most_recent_report(data_income)['grossProfit']
 
-    # Spécifiez la feuille de destination et la cellule de destination
-    destination_sheet_name = copy_sheet  # Remplacez par le nom de la feuille de destination
-    destination_cell = copy_cell  # Remplacez par la cellule de destination où vous souhaitez coller
+    gross_margin = gross_profit / turnover * 100
 
-    # Accédez aux feuilles source et de destination
-    source_sheet = workbook[source_sheet_name]
-    destination_sheet = workbook[destination_sheet_name]
+    return str(round(gross_margin,2)) + " %"
 
-    # Lisez la valeur de la cellule source
-    source_value = source_sheet[source_cell].value
 
-    # Écrivez la valeur de la cellule source dans la cellule de destination
-    destination_sheet[destination_cell] = source_value
+def get_net_turnover():
+    net_turnover = get_most_recent_report(data_income)['netIncome']
+    return str(round(net_turnover,2)) + " $"
 
-def create_report(ticker):
-    ticker = ticker.replace('.', '_')
-    global filename
-    filename = 'Analyses//' + ticker + '_analyse.xlsx'
-    # Utilisez shutil pour copier le fichier
-    shutil.copy(modele, filename)
 
-def import_data(filename):
+def get_net_margin():
+    net_turnover = get_most_recent_report(data_income)['netIncome']
+    turnover = get_most_recent_report(data_income)['totalRevenue']
 
-    # yahoo
+    net_margin = net_turnover / turnover * 100
 
-    ticker = yahoo_ticker
+    return str(round(net_margin,2)) + " %"
 
-    df_analysts_info = get_analysts_info(ticker)
 
-    df_earnings_estimate = df_analysts_info['Earnings Estimate']
-    df_revenue_estimate = df_analysts_info['Revenue Estimate']
-    df_earning_history = df_analysts_info['Earnings History']
-    #df_eps_trend = df_analysts_info['EPS Trend']
-    df_eps_revisions = df_analysts_info['EPS Revisions']
-    df_growth_estimates = df_analysts_info['Growth Estimates']
+def get_roe():
+    stockholders_equity = get_most_recent_report(data_balance)['stockholdersEquity']
+    net_turnover = get_most_recent_report(data_income)['netIncome']
+    roe = net_turnover / stockholders_equity * 100
+    return str(round(roe,2)) + " %"
 
-    df_data = get_data(ticker)
-    df_data.reset_index(inplace=True)
-    df_data = df_data[df_data['index'] >= '2013-01-01']
 
-    df_holders = get_holders(ticker)
+def get_operating_margin():
+    ebit = get_most_recent_report(data_income)['ebit']
+    turnover = get_most_recent_report(data_income)['totalRevenue']
+    operating_margin = ebit / turnover * 100
+    return str(round(operating_margin,2)) + " %"
 
-    df_top_institutional_holders = df_holders['Top Institutional Holders']
-    df_direct_holders = df_holders['Direct Holders (Forms 3 and 4)']
-    df_major_holders = df_holders['Major Holders']
 
-    df_quote = pd.DataFrame(get_quote_table(ticker), index=[0])
+def get_roa():
+    total_assets = get_most_recent_report(data_balance)['totalAssets']
+    net_turnover = get_most_recent_report(data_income)['netIncome']
+    roa = net_turnover / total_assets * 100
+    return str(round(roa,2)) + " %"
 
-    df_stats = get_stats(ticker)
 
-    df_valuation = get_stats_valuation(ticker)
+def get_payout_ratio():
+    total_dividend_paid = get_most_recent_report(data_cash)['cashDividendsPaid']
+    net_turnover = get_most_recent_report(data_income)['netIncome']
+    payout_ratio = - total_dividend_paid / net_turnover * 100
+    return str(round(payout_ratio,2)) + " %"
 
-    # moning
 
-    ticker = moning_ticker
+def get_ratio_equity_debt():
+    stockholders_equity = get_most_recent_report(data_balance)['stockholdersEquity']
+    debt = get_most_recent_report(data_balance)['longTermDebt']
+    ratio_debt_equity = debt / stockholders_equity * 100
+    return str(round(ratio_debt_equity,2)) + " %"
 
-    selected_url = f'https://moning.co/fr/actions/{ticker.upper()}'
-    action_soup = get_connection(selected_url)
 
-    data = get_sub_elements(action_soup.find_all('p', class_='stats-display-text'))
-    liste1 = ['Rendement', 'Croissance div. / 5 ans', 'Capitalisation', 'Ratio cours/bénéfices', 'Beta (volatilité)', 'Bénéfice par action', 'Dividende sans interruption', 'Fréquence', 'Montant Annuel à terme', 'Ex-dividende']
-    liste2 = [re.search(r'[-+]?\d*\.\d+|\d+', item).group() if not re.search(r'\d{2}/\d{2}/\d{4}', item) else item.strip() for item in data]
-    stats = pd.DataFrame(combine_tab(liste1, liste2), columns=['indicateur', 'unité'])
+def get_per():
+    total_cap = get_most_recent_report(data_balance)['totalCapitalization']
+    net_turnover = get_most_recent_report(data_income)['netIncome']
+    per = total_cap / net_turnover * 100
+    return str(round(per,2)) + " %"
 
-    data = get_sub_elements(action_soup.find_all('div', class_='inline-flex px-3 py-1 text-sm font-medium leading-none bg-emerald-100 text-emerald-800 rounded-sm'))
-    liste1 = ['Retour sur 1 an', 'Retour sur 5 ans']
-    liste2 = [re.search(r'[-+]?\d*\.\d+|\d+', item).group() for item in data if re.search(r'[-+]?\d*\.\d+|\d+', item)]
-    performances = pd.DataFrame(combine_tab(liste1, liste2), columns=['années', '%'])
 
-    dividendChart = extract_graph(action_soup, 'dividendChart')
-    yoyRevenueChart = extract_graph(action_soup, 'yoyRevenueChart')
-    FCFPerShareChart= extract_graph(action_soup, 'FCFPerShareChart')
-    EPSChart = extract_graph(action_soup, 'EPSChart')
-    yoyFCFPerShareChart = extract_graph(action_soup, 'yoyFCFPerShareChart')
-    totalRevenueChart = extract_graph(action_soup, 'totalRevenueChart')
-    yoyEPSChart = extract_graph(action_soup, 'yoyEPSChart')
-    operatingMarginChart = extract_graph(action_soup, 'operatingMarginChart')
-    netMarginChart = extract_graph(action_soup, 'netMarginChart')
-    returnOnEquityChart = extract_graph(action_soup, 'returnOnEquityChart')
-    debtCapitalChart = extract_graph(action_soup, 'debtCapitalChart')
-    debtEbitdaChart = extract_graph(action_soup, 'debtEbitdaChart')
+def get_today_stock():
+    return str(round(stock_history['prices'][0]['close'],2)) + " $"
 
-    data = get_sub_elements(action_soup.find_all('span', class_='text-sm text-gray-500'))
-    liste1 = ['PRICE TO BOOK', 'PAYOUT RATIO', 'RATIO COURS/BÉNÉFICES', 'PEG RATIO', 'PRICE TO SALES', 'PRICE / FCF', 'ENTERPRISE VALUE REVENUE']
-    liste2 = [re.search(r'[-+]?\d*\.\d+|\d+', item).group() for item in data if re.search(r'[-+]?\d*\.\d+|\d+', item)]
-    #valorisation = pd.DataFrame(combine_tab(liste1, liste2), columns=['indicateur', 'unité'])
 
-    with pd.ExcelWriter(filename, engine='openpyxl', mode='a') as writer:
+def get_all_indicators():
+    global ticker_status
+    print("\nTry one of this functionality")
+    print("0) Change ticker")
+    print("1) Stock price")
+    print("2) Turnover")
+    print("3) Net Turnover")
+    print("4) Gross margin")
+    print("5) Net margin")
+    print("6) Operating margin")
+    print("7) ROE (Return on Equity)")
+    print("8) ROA (Return on Assets)")
+    print("9) Payout Ratio")
+    print("10) PER (Price Earnings Ratio)")
+    print("11) Free Cash-Flow")
+    print("12) Ratio Equity/Debt")
+    print("13) All of above indicators")
+    number = input('\nChatbot: Enter the number of indicator you want to retrieve\nUser: ')
+    if number == "1":
+        print(get_today_stock())
+    elif number == "2":
+        print(get_turnover())
+    elif number == "3":
+        print(get_net_turnover())
+    elif number == "4":
+        print(get_gross_margin())
+    elif number == "5":
+        print(get_net_margin())
+    elif number == "6":
+        print(get_operating_margin())
+    elif number == "7":
+        print(get_roe())
+    elif number == "8":
+        print(get_roa())
+    elif number == "9":
+        print(get_payout_ratio())
+    elif number == "10":
+        print(get_per())
+    elif number == "11":
+        print(get_free_cash_flow())
+    elif number == "12":
+        print(get_ratio_equity_debt())
+    elif number == "13":
+        df = pd.DataFrame({
+            "Stock of the day": [get_today_stock()],
+            "Gross turnover": [get_turnover()],
+            "Net turnover": [get_net_turnover()],
+            "Gross margin": [get_gross_margin()],
+            "Net margin": [get_net_margin()],
+            "Operating margin": [get_operating_margin()],
+            "ROE (Return on Equity) ": [get_roe()],
+            "ROA (Return on Assets)": [get_roa()],
+            "Payout Ratio": [get_payout_ratio()],
+            "PER (Price Earnings Ratio)": [get_per()],
+            "Free Cash-Flow": [get_free_cash_flow()],
+            "Ratio Debt/Equity": [get_ratio_equity_debt()]
+        })
+        df_melted = pd.melt(df, var_name='Indicators', value_name='Values')
+        df_melted.index = df_melted.index.map(lambda x : x+1)
+        print(df_melted)
+    elif number == "0":
+        ticker_status = False
 
-        # Enregistrez chaque DataFrame dans une feuille Excel distincte
-        df_earnings_estimate.to_excel(writer, sheet_name='earnings_estimate', index=False)
-        df_revenue_estimate.to_excel(writer, sheet_name='revenue_estimate', index=False)
-        df_earning_history.to_excel(writer, sheet_name='earning_history', index=False)
-        #df_eps_trend.to_excel(writer, sheet_name='eps_trend', index=False)
-        df_eps_revisions.to_excel(writer, sheet_name='eps_revisions', index=False)
-        df_growth_estimates.to_excel(writer, sheet_name='growth_estimates', index=False)
-        df_data.to_excel(writer, sheet_name='data', index=False)
-        df_top_institutional_holders.to_excel(writer, sheet_name='top_institutional_holders', index=False)
-        df_direct_holders.to_excel(writer, sheet_name='direct_holders', index=False)
-        df_major_holders.to_excel(writer, sheet_name='major_holders', index=False)
-        df_quote.to_excel(writer, sheet_name='quote', index=False)
-        df_stats.to_excel(writer, sheet_name='stats', index=False)
-        df_valuation.to_excel(writer, sheet_name='valuation', index=False)
-        stats.to_excel(writer, sheet_name='moning_stats', index=False)
-        performances.to_excel(writer, sheet_name='performances', index=False)
-        dividendChart.to_excel(writer, sheet_name='dividendChart', index=False)
-        yoyRevenueChart.to_excel(writer, sheet_name='yoyRevenueChart', index=False)
-        FCFPerShareChart.to_excel(writer, sheet_name='FCFPerShareChart', index=False)
-        EPSChart.to_excel(writer, sheet_name='EPSChart', index=False)
-        yoyFCFPerShareChart.to_excel(writer, sheet_name='yoyFCFPerShareChart', index=False)
-        totalRevenueChart.to_excel(writer, sheet_name='totalRevenueChart', index=False)
-        yoyEPSChart.to_excel(writer, sheet_name='yoyEPSChart', index=False)
-        operatingMarginChart.to_excel(writer, sheet_name='operatingMarginChart', index=False)
-        netMarginChart.to_excel(writer, sheet_name='netMarginChart', index=False)
-        returnOnEquityChart.to_excel(writer, sheet_name='returnOnEquityChart', index=False)
-        debtCapitalChart.to_excel(writer, sheet_name='debtCapitalChart', index=False)
-        debtEbitdaChart.to_excel(writer, sheet_name='debtEbitdaChart', index=False)
-        #valorisation.to_excel(writer, sheet_name='valorisation', index=False)
 
-def calculate_score(filename):
-
-    # Chargez le fichier Excel existant
-    workbook = openpyxl.load_workbook(filename)
-
-    df = pd.read_excel(filename, sheet_name='yoyRevenueChart')  # Remplacez 'votre_fichier.xlsx' par le chemin vers votre fichier Excel
-    dernieres_valeurs = df['value'].tail(5)  # Remplacez 'value' par 'year' si vous souhaitez calculer la moyenne de 'year'
-    moyenne_ca = dernieres_valeurs.mean()
-
-    df = pd.read_excel(filename, sheet_name='FCFPerShareChart')  # Remplacez 'votre_fichier.xlsx' par le chemin vers votre fichier Excel
-    dernieres_valeurs = df['value'].tail(5)  # Remplacez 'value' par 'year' si vous souhaitez calculer la moyenne de 'year'
-    moyenne_fcf = dernieres_valeurs.mean()
-
-    workbook['Score']['M1'].value =  str(round(float(workbook['quote']['P2'].value), 2)).replace('.', ',') # Prix de l'action
-
-    workbook['Score']['B5'].value = str(round(float(moyenne_ca), 2)).replace('.', ',') # Chiffre d'affaire
-
-    workbook['Score']['B7'].value = str(round(float(moyenne_fcf), 2)).replace('.', ',')  # Free Cash Flow
-
-    value_B37 = float(str(workbook['stats']['B37'].value.replace('B', '').replace('M', '')))
-    value_B40 = float(str(workbook['stats']['B40'].value.replace('B', '').replace('M', '')))
-    marge_brute = (value_B40 / value_B37) * 100
-    workbook['Score']['B14'].value = str(round(float(marge_brute), 2)).replace('.', ',') # Marge brute
-
-    workbook['Score']['B18'].value =  str(round(float(workbook['stats']['B33'].value.replace('%', '')), 2)).replace('.', ',') # Marge nette
-    workbook['Score']['B16'].value =  str(round(float(workbook['stats']['B34'].value.replace('%', '')), 2)).replace('.', ',') # Marge d’exploitation
-    workbook['Score']['B20'].value =  str(round(float(workbook['stats']['B36'].value.replace('%', '')), 2)).replace('.', ',') # ROE 
-    workbook['Score']['B22'].value =  str(round(float(workbook['stats']['B35'].value.replace('%', '')), 2)).replace('.', ',') # ROA
-    workbook['Score']['B28'].value =  str(round(float(workbook['moning_stats']['B3'].value), 2)).replace('.', ',') # Croissance du dividende
-    workbook['Score']['B30'].value =  str(round(float(workbook['stats']['B26'].value.replace('%', '')), 2)).replace('.', ',') # Payout Ratio
-    workbook['Score']['B32'].value =  str(round(float(workbook['moning_stats']['B2'].value), 2)).replace('.', ',') # Rendement de l'action
-    workbook['Score']['B34'].value =  str(round(float(workbook['moning_stats']['B8'].value), 2)).replace('.', ',') # Versement du dividende sans interruption
-    workbook['Score']['B40'].value =  str(round(float(workbook['stats']['B48'].value.replace('%', '')), 2)).replace('.', ',') # Dette / Equity
-    workbook['Score']['B42'].value =  str(round(float(workbook['debtEbitdaChart']['A7'].value), 2)).replace('.', ',') # Dette / EBITDA (Leverage)
-    workbook['Score']['B48'].value =  str(round(float(workbook['quote']['N2'].value), 2)).replace('.', ',') # PER
-    #workbook['Score']['B50'].value =  str(workbook['valorisation']['B5'].value) # PEG
-    #workbook['Score']['B52'].value =  str(workbook['valorisation']['B2'].value) # P/B
-    
-    workbook['Valeur Intrasèque']['B3'].value =  str(workbook['Score']['M1'].value).replace('.', ',')
-    workbook['Valeur Intrasèque']['B4'].value =  str(round(float(workbook['stats']['B50'].value), 2)).replace('.', ',')
-    workbook['Valeur Intrasèque']['B5'].value = '5.21'.replace('.', ',').replace('.', ',')
-    workbook['Valeur Intrasèque']['B6'].value =  str(round(float(workbook['moning_stats']['B7'].value), 2)).replace('.', ',')
-    workbook['Valeur Intrasèque']['B7'].value =  str(round(float(workbook['growth_estimates']['B6'].value.replace('%', '')), 2)).replace('.', ',')
-    workbook['Valeur Intrasèque']['B9'].value =  str(workbook['Score']['B48'].value).replace('.', ',')
-
-    workbook.save(filename)
-    workbook = openpyxl.load_workbook(filename)
-
-    #st.write(workbook['Valeur Intrasèque']['E4'].value)
-
-    app = xw.App(visible=True)
-    wb = xw.Book(filename)
-    #st.write(filename)
-    worksheet = wb.sheets['Valeur Intrasèque']
-    #st.write(worksheet.range('E4').value, type(worksheet.range('E4').value))
-    val_intraseque = (worksheet.range('E4').value + worksheet.range('F4').value + worksheet.range('G4').value) / 3
-    #st.write(f'valeur intras {val_intraseque} + {worksheet.range("E4").value}')
-    wb.close()
-    app.quit()
-
-    #workbook['Score']['P1'].value = val_intraseque # Valeur Intrasèque
-    #workbook['Score']['B54'].value = 100 - (workbook['Score']['P1'].value * 100 / workbook['Score']['M1'].value) # Valorisation
-    #workbook['Score']['Q1'].value = workbook['Score']['P1'].value * workbook['Valeur Intrasèque']['B10'].value # Marge de sécurité
-    
-    workbook.save(filename)
 
 def get_stocks_report():
-    global yahoo_ticker, moning_ticker
-    st.write('\nChatbot: Enter stock name to analyze')
-    stock_name = st.text_input("You: ", "")
-    if st.button("Create report"):
-        yahoo_ticker = get_yahoo_ticker(stock_name)
-        moning_ticker = get_moning_ticker(stock_name)
-        create_report(yahoo_ticker)
-        import_data(filename)
-        calculate_score(filename)
-        st.write('\nChatbot: Report uploaded successfully !')
-
-#get_stocks_report()
+    global data_income, data_cash, data_balance, stock_history
+    global ticker_status
+    exit_conditions = ("q", "quit", "exit", 'bye')
+    while True:
+        ticker_status = True
+        ticker = input('\nChatbot: Enter your ticker please\nUser: ')
+        if ticker in exit_conditions:
+            break
+        while ticker_status:
+            try:
+                data_income, data_cash, data_balance, stock_history = request_data(ticker.strip())
+                get_all_indicators()
+            except:
+                ticker_yahoo = pd.read_excel("tickers_yahoo.xlsx")[['Ticker', 'Name']]
+                print('\nChatbot: Bad ticker. Try one of this please')
+                print(ticker_yahoo.head(10))
+                ticker_status = False

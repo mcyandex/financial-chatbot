@@ -45,7 +45,7 @@ responses = {
     ],
     "personal finance" : get_personal_finance,
     "stock recommendation": get_stock_recommendation,
-    "stocks history" : get_financial_advices,
+    "yahoo advice articles" : get_financial_advices,
 
     "default" : "I don't understand. Can you rephrase your question?"
     ,
