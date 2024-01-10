@@ -91,21 +91,26 @@ def start_chat():
 
     # Display chat history
     for message in st.session_state.messages:
-        st.write(message["role"] + ": " + message["content"])
+        with st.expander(message["role"].capitalize()):
+            st.markdown(message["content"])
 
     # Accept user input
-    user_input = st.text_input("\nYou: ")
-
-    if st.button("Ask") and user_input:
+    user_input = st.chat_input("\nYou: ")
+    
+    if user_input:
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": user_input})
+        # Display user message in chat message container
+        with st.expander("User"):
+            st.markdown(user_input)
+
         # Handle user input and generate assistant response
         handle_user_input(user_input.lower())
 
 
 def handle_user_input(user_input):
     if user_input in responses:
-        st.session_state.messages.append({"role": "assistant", "content": random.choice(responses[user_input])})
+        st.write("\nChatbot: " + random.choice(responses[user_input]))
     elif user_input == "options":
         get_options()
     elif user_input == "1":
@@ -119,8 +124,9 @@ def handle_user_input(user_input):
     elif user_input == "help":
         get_help()
     elif user_input in exits:
-        st.session_state.messages.append({"role": "assistant", "content": "Goodbye! Until next time."})
+        st.write("\nChatbot: Goodbye! Until next time.")
     else:
-        st.session_state.messages.append({"role": "assistant", "content": "I don't understand. Can you rephrase your question?"})
+        st.write("\nChatbot: I don't understand. Can you rephrase your question?")
+
 
 
