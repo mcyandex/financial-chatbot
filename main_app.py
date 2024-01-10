@@ -1,6 +1,10 @@
 import random
 import streamlit as st
 from stocks_consulting import *
+from stocks_consulting import *
+from yahoo_articles import *
+from personal_finance import *
+from stock_recommendation import *
 import importlib
 
 # Assuming the page files are in the "pages" folder and have the same name as the page function
@@ -100,19 +104,23 @@ def start_chat():
             st.write(f"\nYou {i + 1}: {input_text}")
             st.write(f"Chatbot {i + 1}: {output_text}")
 
-        user_input_lower = user_input.lower()
-        if user_input_lower in responses:
-            st.write("\nChatbot: " + random.choice(responses[user_input_lower]))
-        elif user_input_lower == "options":
+        user_input = st.text_input("\nUser: ").lower()
+        if user_input in responses:
+            st.write("\nChatbot: " + random.choice(responses[user_input]))
+        elif user_input == "options":
             get_options()
-        elif user_input_lower == "1":
-            # Change the page based on user input
-            selected_page_name = "1_Stocks consulting"
-            selected_page = load_page(selected_page_name)
-            selected_page()
-        elif user_input_lower == "help":
+        elif user_input == "1":
+            get_stocks_report()
+        elif user_input == "2":
+            get_personal_finance()
+        elif user_input == "3":
+            get_financial_advices()
+        elif user_input == "4":
+            get_stock_recommendation()
+        elif user_input == "help":
             get_help()
-        elif user_input_lower in exits:
+        elif user_input in exits:
             st.write("\nChatbot: Goodbye! Until next time.")
         else:
             st.write("\nChatbot: I don't understand. Can you rephrase your question?")
+

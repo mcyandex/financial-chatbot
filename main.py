@@ -75,7 +75,7 @@ def start_chat():
     get_options()
 
     while True:
-        user_input = input("\nUser: ").lower()
+        user_input = st.text_input("\nUser: ").lower()
         if user_input in responses:
             st.write("\nChatbot: " + random.choice(responses[user_input]))
         elif user_input == "options":
