@@ -5,6 +5,7 @@ from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+import streamlit as st
 
 def get_yahoo_finance_articles(base_url, count=26):
     """
@@ -36,11 +37,11 @@ def get_yahoo_finance_articles(base_url, count=26):
 def print_articles(articles):
   if articles:
     for i, article in enumerate(articles):
-        print(f"\nArticle {i + 1}:")
-        print(f"Titre: {article['title']}")
-        print(f"Liens: {article['link']}")
+        st.write(f"\nArticle {i + 1}:")
+        st.write(f"Titre: {article['title']}")
+        st.write(f"Liens: {article['link']}")
   else:
-      print("Aucun article trouvé.")
+      st.write("Aucun article trouvé.")
 
 def get_titles(articles):
   titles = []
@@ -144,7 +145,7 @@ def start_chatbot_yahoo():
        else:
            best_article = get_best_article(query)
            best_sentence = get_following_sentences(query, best_article)
-           print(f"\nChatbot: {best_sentence}")
+           st.write(f"\nChatbot: {best_sentence}")
            preprocessed_bdd.pop()
 
 def get_financial_advices():
