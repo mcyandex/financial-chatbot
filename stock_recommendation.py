@@ -43,16 +43,13 @@ def get_stock_recommendation():
     vectorizer = TfidfVectorizer(stop_words='english')
     global tfidf_matrix
     tfidf_matrix = vectorizer.fit_transform(df['Features'])
-    while True:
-        st.write("\nChatbot: Please enter a date (MM/DD/YYYY)\n")
-        user_input_date = input()
-        st.write("\nChatbot: Please enter a ticker\n")
+    st.write("\nChatbot: Please enter a date (MM/DD/YYYY)\n")
+    user_input_date = st.text_input(label="date_input")
+    st.write("\nChatbot: Please enter a ticker\n")
+    if user_input_date:
         ticker = st.text_input().upper()
         recommendations = get_recommendations(user_input_date, ticker)
         st.write(f"\nUser Input Date and Ticker: {user_input_date}, {ticker}")
         st.write(f"\nRecommended Dates: {recommendations}")
         st.write(display_recommended_dates(recommendations, ticker))
         st.write("\nChatbot: Do you want to continue? (yes/no): \n")
-        response = st.text_input().lower()
-        if response != 'yes':
-            break   

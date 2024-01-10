@@ -71,11 +71,13 @@ def get_options():
 
 
 def get_help():
-    st.write("\nChatbot: Here list of commands you can use")
+    big_string = "\nChatbot: Here list of commands you can use"
     for k in responses.keys():
-        st.write("- " + k)
-    st.write("- options")
-    st.write("- help")
+        big_string+=("\n- " + k)
+    big_string+=("\n- options")
+    big_string+=("\n- help")
+    return big_string
+
 def load_page(page_name):
     module = importlib.import_module(f"{pages_folder}.{page_name}")
     return module.page
@@ -89,23 +91,34 @@ def start_chat():
     if st.session_state.get("messages") is None:
         st.session_state.messages = []
 
-    # Display chat history
+
+    # Display chat messages from history on app rerun
     for message in st.session_state.messages:
-        st.write(message["role"] + ": " + message["content"])
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
     # Accept user input
-    user_input = st.text_input("\nYou: ")
-
-    if st.button("Ask") and user_input:
+    if prompt := st.chat_input("What is up?"):
         # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": user_input})
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        # Display user message in chat message container
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+
         # Handle user input and generate assistant response
-        handle_user_input(user_input.lower())
+        handle_user_input(prompt.lower())
+
+
 
 
 def handle_user_input(user_input):
     if user_input in responses:
-        st.session_state.messages.append({"role": "assistant", "content": random.choice(responses[user_input])})
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = random.choice(responses[user_input])
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": random.choice(responses[user_input])})
     elif user_input == "options":
         get_options()
     elif user_input == "1":
@@ -117,10 +130,21 @@ def handle_user_input(user_input):
     elif user_input == "4":
         get_stock_recommendation()
     elif user_input == "help":
-        get_help()
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = get_help()
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
     elif user_input in exits:
-        st.session_state.messages.append({"role": "assistant", "content": "Goodbye! Until next time."})
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = "Goodbye! Until next time."
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
     else:
-        st.session_state.messages.append({"role": "assistant", "content": "I don't understand. Can you rephrase your question?"})
-
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = "I don't understand. Can you rephrase your question?"
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
 
