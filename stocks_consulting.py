@@ -1,11 +1,7 @@
 from datetime import *
 import pandas as pd
 import warnings
-<<<<<<< HEAD
-import streamlit as st
-=======
 from yahoofinancials import YahooFinancials
->>>>>>> e77c1a6a5fc5060ac2a2097f6fbf3f46490475f5
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -14,26 +10,6 @@ def get_previous_day():
     previous_day = str(date.today() - timedelta(days=1))
     return previous_day
 
-<<<<<<< HEAD
-def get_moning_ticker(stock):
-    try:
-        stock = stock.lower()
-        selected_url = f'https://moning.co/fr/actions?q={stock}'
-        action_soup = get_connection(selected_url)
-        moning_ticker = action_soup.find_all('div', id='stocks-list')[0].find('a')['href'].rsplit('/', 1)[-1]
-        return moning_ticker
-    except (IndexError) as e:
-        st.write('Ticker not found')
-
-def get_yahoo_ticker(stock):
-    try:
-        df = pd.read_excel('tickers_yahoo.xlsx')
-        stock = stock.lower()
-        yahoo_ticker = df[df['Name'].str.lower().str.contains(stock) & df['Name'].notna()]['Ticker'].iloc[0]
-        return yahoo_ticker  
-    except (IndexError) as e:
-        st.write('Ticker not found')
-=======
 
 def request_data(ticker):
     yf = YahooFinancials(ticker)
@@ -44,7 +20,6 @@ def request_data(ticker):
         yf.get_historical_price_data(start_date=get_previous_day(), end_date=str(date.today()), time_interval="daily")[
             ticker]
     return data_income, data_cash, data_balance, stock_history
->>>>>>> e77c1a6a5fc5060ac2a2097f6fbf3f46490475f5
 
 
 def get_most_recent_report(data):
