@@ -47,9 +47,8 @@ responses = {
     "stock recommendation": get_stock_recommendation,
     "stocks history" : get_financial_advices,
 
-    "default" : [
-        "I don't understand. Can you rephrase your question?"
-    ],
+    "default" : "I don't understand. Can you rephrase your question?"
+    ,
 }
 
 def clean_text(text):
