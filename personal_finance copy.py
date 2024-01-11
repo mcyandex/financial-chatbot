@@ -199,7 +199,7 @@ def check_integer(user_response, question):
         st.write("Error: Please enter a valid integer.")
         while True:
             try:
-                user_response = int(st.text_input(placeholder=f"Chatbot: {question}",label="check_integer",key="check_integer"))
+                user_response = int(st.text_input(placeholder=f"Chatbot: {question}",label="check_integer"))
                 return user_response
             except ValueError:
                 st.write("Error: Please enter a valid integer.")
@@ -214,7 +214,7 @@ def check_string(user_response, question):
         st.write("Error: Please enter either 'yes' or 'no'.")
         while True:
             try:
-                user_response = str(st.text_input(placeholder=f"Chatbot: {question}",label="check_str",key="check_str"))
+                user_response = str(st.text_input(placeholder=f"Chatbot: {question}",label="check_str"))
                 return user_response
             except ValueError:
                 st.write("Error: Please enter either 'yes' or 'no'.")
@@ -222,15 +222,13 @@ def check_string(user_response, question):
 
 #Interaction with the user
 def get_personal_finance():
-    input_count=0
     exit_conditions = ("q", "quit", "exit")
     #st.write("Type q / quit / exit to exit the program.")
     st.write("Chatbot: Welcome to personal finance module !")
     for question in questions:
         keywords = ["income", "transportation", "food", "outing", "other", "savings"]
         st.write(f"Chatbot: {question}")
-        user_response = st.text_input(placeholder="User: ",label="personnal_finance_user",key=f"finance_user{input_count}")
-        input_count+=1
+        user_response = st.text_input(placeholder="User: ",label="personnal_finance_user")
         if user_response in exit_conditions:
             st.write("ATTENTION : QUITTING PERSONAL FINANCE !!")
             return 
@@ -257,10 +255,11 @@ def get_personal_finance():
     print(plot_investment_capacity(user_responses))
     print(plot_pie_chart(user_responses))
     """
-    st.write("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
-    st.write("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
-    st.write("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
-    st.write("Investment capacity (per year) : ", calculate_savings_per_year(user_responses))
+    a = str("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
+    b = str("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
+    c = str("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
+    d = str("Investment capacity (per year) : ", calculate_savings_per_year(user_responses))
     st.pyplot(plot_monthly_breakdown(user_responses))
     st.pyplot(plot_investment_capacity(user_responses))
     st.pyplot(plot_pie_chart(user_responses))
+    return str(a+b+c+d)

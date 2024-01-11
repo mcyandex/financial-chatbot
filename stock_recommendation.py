@@ -35,7 +35,9 @@ def display_recommended_dates(recommendations, ticker):
 #'08/12/2023'
 #"aapl"
 def get_stock_recommendation(): 
+    input_count=0
     restart = True
+    date=""
     while restart:
         global df
         df = pd.read_csv("./Data/ticker_history.csv", delimiter=';')
@@ -47,13 +49,14 @@ def get_stock_recommendation():
         tfidf_matrix = vectorizer.fit_transform(df['Features'])
 
         exit_conditions = ("q", "quit", "exit")
-        st.write("Type q / quit / exit to exit the program.")
+        #st.write("Type q / quit / exit to exit the program.")
         st.write("Chatbot: Welcome to the stock recommendation module !")
 
         questions= ["Chatbot: Please enter a date (MM/DD/YYYY)", "Chatbot: Please enter a ticker"]
         for question in questions:
             st.write(question)
-            user_response = st.text_input("User: ")
+            user_response = st.text_input(label="User: ",key=f"user{input_count}")
+            input_count+=1
             if user_response in exit_conditions:
                 st.write("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
                 return 
@@ -62,11 +65,11 @@ def get_stock_recommendation():
             else:
                 ticker = user_response.upper()
         recommendations = get_recommendations(date, ticker)
-        st.write(f"\nUser st.text_input Date and Ticker: {date}, {ticker}")
+        st.write(f"\nUser print Date and Ticker: {date}, {ticker}")
         st.write(f"\nRecommended Dates: {recommendations}")
         st.write(display_recommended_dates(recommendations, ticker))
         st.write("\nChatbot: Do you want to continue? (yes/no): \n")
-        response = st.text_input().lower()
+        response = st.text_input(label="continue?",key=f"continue{input_count}").lower()
         if response != "yes":
             restart = False
     

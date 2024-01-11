@@ -142,12 +142,13 @@ def get_following_sentences(user_input, best_article, num_following_sentences=5)
         return "I am sorry, I could not understand you."
 
 def start_chatbot_yahoo():
-   exit_conditions = ("q", "quit", "exit", 'bye')
-   while True:
-       query = st.text_input("\nUser: ")
-       if query in exit_conditions:
-           break
-       else:
+  input_count=0
+  exit_conditions = ("q", "quit", "exit", 'bye')
+  query = st.text_input(label="\nUser: ",key=f"user{input_count}")
+  input_count+=1
+  if query in exit_conditions:
+      st.write("EXIT")
+  else:
            best_article = get_best_article(query)
            best_sentence = get_following_sentences(query, best_article)
            st.write(f"\nChatbot: {best_sentence}")
@@ -197,7 +198,7 @@ def get_final_answer(question , bdd):
    return bert_answer
 
 def get_financial_advices():
-  st.write("Type q / quit / exit to exit the program.")
+  #st.write("Type q / quit / exit to exit the program.")
   st.write("Chatbot: Welcome to the yahoo articles module !")
   articles = get_yahoo_finance_articles("https://finance.yahoo.com/topic/personal-finance-news/") + get_yahoo_finance_articles("https://finance.yahoo.com/") + get_yahoo_finance_articles("https://finance.yahoo.com/calendar/") + get_yahoo_finance_articles("https://finance.yahoo.com/topic/stock-market-news/")
   urls = get_links(articles)
