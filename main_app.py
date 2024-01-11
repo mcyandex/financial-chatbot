@@ -139,5 +139,4 @@ def start_chat():
         full_response = bot_response
         message_placeholder.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response})
-                    
-start_chat()
+            
