@@ -197,8 +197,8 @@ def get_final_answer(question , bdd):
    return bert_answer
 
 def get_financial_advices():
-  print("Type q / quit / exit to exit the program.")
-  print("Chatbot: Welcome to the yahoo articles module !")
+  st.write("Type q / quit / exit to exit the program.")
+  st.write("Chatbot: Welcome to the yahoo articles module !")
   articles = get_yahoo_finance_articles("https://finance.yahoo.com/topic/personal-finance-news/") + get_yahoo_finance_articles("https://finance.yahoo.com/") + get_yahoo_finance_articles("https://finance.yahoo.com/calendar/") + get_yahoo_finance_articles("https://finance.yahoo.com/topic/stock-market-news/")
   urls = get_links(articles)
   global bdd

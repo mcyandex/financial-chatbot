@@ -11,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 nltk.download('punkt')
 nltk.download('stopwords')
+nltk.download('wordnet')
 from string import punctuation
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -125,18 +126,18 @@ def start_chat():
         with st.chat_message("user"):
             st.markdown(prompt)
         
-    if prompt.lower() in ['exit', 'bye', 'quit']:
+        if prompt.lower() in ['exit', 'bye', 'quit']:
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = "Goodbye! Until next time."
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+        #Generate response
+        bot_response = generate_response(prompt)
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            full_response = "Goodbye! Until next time."
+            full_response = bot_response
             message_placeholder.markdown(full_response)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-    #Generate response
-    bot_response = generate_response(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = bot_response
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
             

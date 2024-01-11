@@ -2,6 +2,7 @@ from datetime import *
 import pandas as pd
 import warnings
 from yahoofinancials import YahooFinancials
+import streamlit as st
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -110,46 +111,46 @@ def get_today_stock():
 
 def get_all_indicators():
     global ticker_status
-    print("\nTry one of this functionality")
-    print("0) Change ticker")
-    print("1) Stock price")
-    print("2) Turnover")
-    print("3) Net Turnover")
-    print("4) Gross margin")
-    print("5) Net margin")
-    print("6) Operating margin")
-    print("7) ROE (Return on Equity)")
-    print("8) ROA (Return on Assets)")
-    print("9) Payout Ratio")
-    print("10) PER (Price Earnings Ratio)")
-    print("11) Free Cash-Flow")
-    print("12) Ratio Equity/Debt")
-    print("13) All of above indicators")
-    number = input('\nChatbot: Enter the number of indicator you want to retrieve\nUser: ')
+    st.write("\nTry one of this functionality")
+    st.write("0) Change ticker")
+    st.write("1) Stock price")
+    st.write("2) Turnover")
+    st.write("3) Net Turnover")
+    st.write("4) Gross margin")
+    st.write("5) Net margin")
+    st.write("6) Operating margin")
+    st.write("7) ROE (Return on Equity)")
+    st.write("8) ROA (Return on Assets)")
+    st.write("9) Payout Ratio")
+    st.write("10) PER (Price Earnings Ratio)")
+    st.write("11) Free Cash-Flow")
+    st.write("12) Ratio Equity/Debt")
+    st.write("13) All of above indicators")
+    number = st.text_input('\nChatbot: Enter the number of indicator you want to retrieve\nUser: ')
     if number == "1":
-        print(get_today_stock())
+        st.write(get_today_stock())
     elif number == "2":
-        print(get_turnover())
+        st.write(get_turnover())
     elif number == "3":
-        print(get_net_turnover())
+        st.write(get_net_turnover())
     elif number == "4":
-        print(get_gross_margin())
+        st.write(get_gross_margin())
     elif number == "5":
-        print(get_net_margin())
+        st.write(get_net_margin())
     elif number == "6":
-        print(get_operating_margin())
+        st.write(get_operating_margin())
     elif number == "7":
-        print(get_roe())
+        st.write(get_roe())
     elif number == "8":
-        print(get_roa())
+        st.write(get_roa())
     elif number == "9":
-        print(get_payout_ratio())
+        st.write(get_payout_ratio())
     elif number == "10":
-        print(get_per())
+        st.write(get_per())
     elif number == "11":
-        print(get_free_cash_flow())
+        st.write(get_free_cash_flow())
     elif number == "12":
-        print(get_ratio_equity_debt())
+        st.write(get_ratio_equity_debt())
     elif number == "13":
         df = pd.DataFrame({
             "Stock of the day": [get_today_stock()],
@@ -167,7 +168,7 @@ def get_all_indicators():
         })
         df_melted = pd.melt(df, var_name='Indicators', value_name='Values')
         df_melted.index = df_melted.index.map(lambda x : x+1)
-        print(df_melted)
+        st.write(df_melted)
     elif number == "0":
         ticker_status = False
 
@@ -179,7 +180,7 @@ def get_stocks_report():
     exit_conditions = ("q", "quit", "exit", 'bye')
     while True:
         ticker_status = True
-        ticker = input('\nChatbot: Enter your ticker please\nUser: ')
+        ticker = st.text_input('\nChatbot: Enter your ticker please\nUser: ')
         if ticker in exit_conditions:
             break
         while ticker_status:
@@ -188,6 +189,6 @@ def get_stocks_report():
                 get_all_indicators()
             except:
                 ticker_yahoo = pd.read_excel("tickers_yahoo.xlsx")[['Ticker', 'Name']]
-                print('\nChatbot: Bad ticker. Try one of this please')
-                print(ticker_yahoo.head(10))
+                st.write('\nChatbot: Bad ticker. Try one of this please')
+                st.write(ticker_yahoo.head(10))
                 ticker_status = False
