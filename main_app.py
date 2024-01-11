@@ -45,9 +45,10 @@ responses = {
         "I can provide guidance on budgeting, investments, retirement planning, and more. Feel free to ask me any questions related to personal finance!",
         "You can ask me about budgeting strategies, investment tips, and retirement planning. How can I assist you today?",
     ],
-    "personal finance" : get_personal_finance,
-    "stock recommendation": get_stock_recommendation,
-    "yahoo advice articles" : get_financial_advices,
+    "stocks consulting": ["http://localhost:8501/Stocks_consulting"],
+    "personal finance" : ["http://localhost:8501/2_Personal-Finance"],
+    "stock recommendation": ["http://localhost:8501/Yahoo-articles"],
+    "yahoo advice articles" : ["http://localhost:8501/Stock-Recommentation"],
 
     "default" : "I don't understand. Can you rephrase your question?"
     ,

@@ -55,7 +55,7 @@ def get_stock_recommendation():
         questions= ["Chatbot: Please enter a date (MM/DD/YYYY)", "Chatbot: Please enter a ticker"]
         for question in questions:
             st.write(question)
-            user_response = st.text_input(label="User: ",key=f"user{input_count}")
+            user_response = st.text_input(label="\n User :",key=f"user{input_count}")
             input_count+=1
             if user_response in exit_conditions:
                 st.write("ATTENTION : QUITTING STOCK RECOMMENDATION !!")
@@ -69,7 +69,7 @@ def get_stock_recommendation():
         st.write(f"\nRecommended Dates: {recommendations}")
         st.write(display_recommended_dates(recommendations, ticker))
         st.write("\nChatbot: Do you want to continue? (yes/no): \n")
-        response = st.text_input(label="continue?",key=f"continue{input_count}").lower()
+        response = st.text_input(label="\n User :",key=f"continue{input_count}").lower()
         if response != "yes":
             restart = False
     

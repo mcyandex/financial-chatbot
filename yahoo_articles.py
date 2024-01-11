@@ -11,7 +11,7 @@ import streamlit as st
 
 model = BertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
 tokenizer = BertTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-
+@st.cache_data
 def get_yahoo_finance_articles(base_url, count=26):
     """
     Retrieves Yahoo Finance articles from the specified base URL.

@@ -126,8 +126,8 @@ def get_all_indicators():
     st.write("11) Free Cash-Flow")
     st.write("12) Ratio Equity/Debt")
     st.write("13) All of above indicators")
-    st.write('\nChatbot: Enter the number of indicator you want to retrieve\nUser: ')
-    number = st.text_input(label="number",key="number")
+    st.write('\nChatbot: Enter the number of indicator you want to retrieve ')
+    number = st.text_input(label="\nUser:",key="number")
     if number == "1":
         st.write(get_today_stock())
     elif number == "2":
@@ -182,8 +182,8 @@ def get_stocks_report():
     exit_conditions = ("q", "quit", "exit", 'bye')
     while True:
         ticker_status = True
-        st.write('\nChatbot: Enter your ticker please\nUser: ')
-        ticker = st.text_input(label="ticker",key=f"ticker{input_count}")
+        st.write('\nChatbot: Enter your ticker please ')
+        ticker = st.text_input(label="\nUser:",key=f"ticker{input_count}").upper()
         input_count+=1
         if ticker in exit_conditions:
             break
