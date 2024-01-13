@@ -182,11 +182,6 @@ def plot_pie_chart(user_responses):
         plt.show()
     else:
         return 
-    
-"""# Display collected information
-print("\n Collected data :")
-for question, answer in user_responses.items():
-    print(f"{question}: {answer}")"""
 
 def check_integer(user_response, question):
     if user_response == "":
