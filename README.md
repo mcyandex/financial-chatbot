@@ -16,6 +16,10 @@ Financial-Chatbot
 │
 ├── app
 │
+├── pages
+│
+├── app.py
+│
 ├── main
 │
 ├── personal-finance
@@ -31,7 +35,11 @@ Financial-Chatbot
 
 #### Details
 
-- `app`: This is the file for running the app of the chatbot using streamlit
+- `app`: This is the folder for the functions modified for the app
+
+- `pages`: This is the folder for all the pages for the streamlit
+
+- `app.py`: This is the file for running the app of the chatbot using streamlit
 
 - `main`: This is the the main file of interaction for the chatbot 
 
