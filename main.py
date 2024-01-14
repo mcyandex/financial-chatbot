@@ -1,8 +1,8 @@
 import random
-from stocks_consulting_app import *
-from yahoo_articles_app import *
-from personal_finance_app import *
-from stock_recommendation_app import *
+from stocks_consulting import *
+from yahoo_articles import *
+from personal_finance import *
+from stock_recommendation import *
 import nltk
 import random
 import re
@@ -43,7 +43,6 @@ responses = {
         "I can provide guidance on budgeting, investments, retirement planning, and more. Feel free to ask me any questions related to personal finance!",
         "You can ask me about budgeting strategies, investment tips, and retirement planning. How can I assist you today?",
     ],
-    "stocks consulting": get_stocks_report,
     "personal finance" : get_personal_finance,
     "stock recommendation": get_stock_recommendation,
     "yahoo advice articles" : get_financial_advices,
@@ -106,7 +105,7 @@ def generate_response(user_input):
     return response
 
 def start_chat():
-    st.write(
+    print(
         "\nChatbot: Hello, I am your Financial Advisor Bot. Feel free to ask me any questions related to personal finance:"
     )
 

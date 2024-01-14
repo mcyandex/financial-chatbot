@@ -1,5 +1,5 @@
 import streamlit as st
-from main_app import *
+from App.main_app import *
 
 
 

@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import streamlit as st
 
 # Ask questions and store responses
 questions = [
@@ -117,7 +116,7 @@ def plot_monthly_breakdown(user_responses):
 
     ax.legend()
     # Display the bar chart
-    st.pyplot(fig)
+    plt.show()
 
 def plot_investment_capacity(user_responses):
     income, costs = calculate_income_and_costs(user_responses)
@@ -146,7 +145,7 @@ def plot_investment_capacity(user_responses):
 
     ax.legend()
     # Display the bar chart
-    st.pyplot(fig)
+    plt.show()
 
 def plot_pie_chart(user_responses):
     variable_costs = user_responses.get("Do you have any variable costs this year?") if user_responses.get("Do you have any variable costs this year?", 0) else {}
@@ -191,13 +190,13 @@ def check_integer(user_response, question):
         user_response = int(user_response)
         return user_response
     except ValueError:
-        st.write("Error: Please enter a valid integer.")
+        print("Error: Please enter a valid integer.")
         while True:
             try:
-                user_response = int(st.text_input(placeholder=f"Chatbot: {question}",label="check_integer"))
+                user_response = int(input(f"Chatbot: {question}"))
                 return user_response
             except ValueError:
-                st.write("Error: Please enter a valid integer.")
+                print("Error: Please enter a valid integer.")
 
 def check_string(user_response, question):
     if user_response == "":
@@ -206,31 +205,31 @@ def check_string(user_response, question):
         if user_response.lower() == "yes" or user_response.lower() == "no":
             return user_response
     except ValueError:
-        st.write("Error: Please enter either 'yes' or 'no'.")
+        print("Error: Please enter either 'yes' or 'no'.")
         while True:
             try:
-                user_response = str(st.text_input(placeholder=f"Chatbot: {question}",label="check_str"))
+                user_response = str(input(f"Chatbot: {question}"))
                 return user_response
             except ValueError:
-                st.write("Error: Please enter either 'yes' or 'no'.")
+                print("Error: Please enter either 'yes' or 'no'.")
         
 
 #Interaction with the user
 def get_personal_finance():
     exit_conditions = ("q", "quit", "exit")
-    #st.write("Type q / quit / exit to exit the program.")
-    st.write("Chatbot: Welcome to personal finance module !")
+    print("Type q / quit / exit to exit the program.")
+    print("Chatbot: Welcome to personal finance module !")
     for question in questions:
         keywords = ["income", "transportation", "food", "outing", "other", "savings"]
-        st.write(f"Chatbot: {question}")
-        user_response = st.text_input(placeholder="User: ",label="personnal_finance_user")
+        print(f"Chatbot: {question}")
+        user_response = input("User: ")
         if user_response in exit_conditions:
-            st.write("ATTENTION : QUITTING PERSONAL FINANCE !!")
+            print("ATTENTION : QUITTING PERSONAL FINANCE !!")
             return 
         elif any(keyword in question.lower() for keyword in keywords):                
             user_responses[question] = check_integer(user_response, question)
         elif question == "Do you have any variable costs this year?" :
-            #st.write(user_response)
+            #print(user_response)
             user_responses[question] = check_string(user_response, question)
             try: 
                 if user_response.lower() == "no" or user_response == "" :
@@ -238,10 +237,9 @@ def get_personal_finance():
                 else :
                     user_responses[question] = get_variable_costs(user_responses)
             except ValueError:
-                # If conversion fails, st.write an error message and continue the loop
-                st.write("Error: Please enter a valid string.")
+                # If conversion fails, print an error message and continue the loop
+                print("Error: Please enter a valid string.")
     #Metrics
-    """
     print("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
     print("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
     print("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
@@ -249,12 +247,3 @@ def get_personal_finance():
     print(plot_monthly_breakdown(user_responses))
     print(plot_investment_capacity(user_responses))
     print(plot_pie_chart(user_responses))
-    """
-    a = str("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
-    b = str("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
-    c = str("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
-    d = str("Investment capacity (per year) : ", calculate_savings_per_year(user_responses))
-    st.pyplot(plot_monthly_breakdown(user_responses))
-    st.pyplot(plot_investment_capacity(user_responses))
-    st.pyplot(plot_pie_chart(user_responses))
-    return str(a+b+c+d)
