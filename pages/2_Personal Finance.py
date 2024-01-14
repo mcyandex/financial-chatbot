@@ -5,7 +5,7 @@ from App.personal_finance_app import *
 
 
 st.title("Personal Finance")
-st.write("Welcome to the Budget Recommendation page!")
+st.write("Welcome to the Personal Finance page!")
 st.write("This page consist of having some indicators or informations about all your investisment ")
 st.write("")
 
