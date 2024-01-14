@@ -1,8 +1,9 @@
 import random
-from stocks_consulting import *
-from yahoo_articles import *
-from personal_finance import *
-from stock_recommendation import *
+from App.stocks_consulting_app import *
+from App.yahoo_articles_app import *
+from App.personal_finance_app import *
+from App.stock_recommendation_app import *
+import streamlit as st
 import nltk
 import random
 import re
@@ -10,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 nltk.download('punkt')
 nltk.download('stopwords')
+nltk.download('wordnet')
 from string import punctuation
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -43,9 +45,10 @@ responses = {
         "I can provide guidance on budgeting, investments, retirement planning, and more. Feel free to ask me any questions related to personal finance!",
         "You can ask me about budgeting strategies, investment tips, and retirement planning. How can I assist you today?",
     ],
-    "personal finance" : get_personal_finance,
-    "stock recommendation": get_stock_recommendation,
-    "yahoo advice articles" : get_financial_advices,
+    "stocks consulting": ["http://localhost:8501/Stocks_consulting"],
+    "personal finance" : ["http://localhost:8501/2_Personal-Finance"],
+    "stock recommendation": ["http://localhost:8501/Yahoo-articles"],
+    "yahoo advice articles" : ["http://localhost:8501/Stock-Recommentation"],
 
     "default" : "I don't understand. Can you rephrase your question?"
     ,
@@ -105,19 +108,37 @@ def generate_response(user_input):
     return response
 
 def start_chat():
-    print(
+    st.write(
         "\nChatbot: Hello, I am your Financial Advisor Bot. Feel free to ask me any questions related to personal finance:"
     )
 
-    while True:
-        user_input = input("\nUser: ").lower()
+    
+    if st.session_state.get("messages") is None:
+        st.session_state.messages = []
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-        if user_input.lower() in ['exit', 'bye', 'quit']:
-            print("\nChatbot: Goodbye! Until next time.")
-            break
+    if prompt := st.chat_input("What is up?"):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        # Display user message in chat message container
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        if prompt.lower() in ['exit', 'bye', 'quit']:
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = "Goodbye! Until next time."
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
 
         #Generate response
-        bot_response = generate_response(user_input)
-        print("Chatbot:", bot_response)
-                    
-start_chat()
+        bot_response = generate_response(prompt)
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = bot_response
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            

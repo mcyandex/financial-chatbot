@@ -1,0 +1,7 @@
+[global]
+showWarningOnDirectExecution = false
+disableWidgetStateDuplicationWarning = true
+disableWatchdogWarning = true
+
+[deprecation]
+showPyplotGlobalUse = false
