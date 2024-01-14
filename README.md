@@ -31,7 +31,7 @@ Financial-Chatbot
 
 #### Details
 
-- `app`: This is the app of the chatbot using streamlit
+- `app`: This is the file for running the app of the chatbot using streamlit
 
 - `main`: This is the the main file of interaction for the chatbot 
 
@@ -45,7 +45,7 @@ Financial-Chatbot
 
 
 ## 🔧 Running the code/app <a name = "code/app"></a>
-To run in teaminal 
+To run in terminal 
 ```
 python main.py
 ```
