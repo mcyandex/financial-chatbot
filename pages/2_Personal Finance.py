@@ -4,7 +4,7 @@ import random
 from App.personal_finance_app import *
 
 
-st.title("Budget Recommendation")
+st.title("Personal Finance")
 st.write("Welcome to the Budget Recommendation page!")
 st.write("This page consist of having some indicators or informations about all your investisment ")
 st.write("")

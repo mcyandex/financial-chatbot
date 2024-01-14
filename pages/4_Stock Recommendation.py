@@ -4,7 +4,7 @@ import random
 from App.stock_recommendation_app import *
 
 
-st.title("Investing Recommendation")
+st.title("4_Stock Recommendation")
 st.write("Welcome to the Investing Recommendation page!")
 st.write("This page consist of having giving you dates of a company where the features are really near ")
 
