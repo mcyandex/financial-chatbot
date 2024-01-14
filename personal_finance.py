@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import streamlit as st
 
 # Ask questions and store responses
 questions = [
@@ -149,6 +150,7 @@ def plot_investment_capacity(user_responses):
 
 def plot_pie_chart(user_responses):
     variable_costs = user_responses.get("Do you have any variable costs this year?") if user_responses.get("Do you have any variable costs this year?", 0) else {}
+
 
     income, _ = calculate_income_and_costs(user_responses)
     total_income = sum(income)

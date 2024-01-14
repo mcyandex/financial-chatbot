@@ -254,19 +254,10 @@ def get_personal_finance():
                 # If conversion fails, st.write an error message and continue the loop
                 st.write("Error: Please enter a valid string.")
     #Metrics
-    ask_button = st.button("Ask")
+    ask_button = st.button("Calcul")
 
 
     if ask_button:
-        """
-        print("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
-        print("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
-        print("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))
-        print("Investment capacity (per year) : ", calculate_savings_per_year(user_responses))
-        print(plot_monthly_breakdown(user_responses))
-        print(plot_investment_capacity(user_responses))
-        print(plot_pie_chart(user_responses))
-        """
         st.write("Safety savings : ", int(user_responses.get("How much is your net fixed income per month?")) if user_responses.get("How much is your net fixed income per month?", 0) else 0)
         st.write("Available amount to invest : ",calculate_available_amount_to_invest(user_responses))
         st.write("Investment capacity (per month) : ", calculate_savings_per_month(user_responses))

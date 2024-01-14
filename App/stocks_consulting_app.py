@@ -173,8 +173,6 @@ def get_all_indicators():
     elif number == "0":
         ticker_status = False
 
-
-
 def get_stocks_report():
     input_count=0
     global data_income, data_cash, data_balance, stock_history
