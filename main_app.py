@@ -1,8 +1,8 @@
 import random
-from stocks_consulting import *
-from yahoo_articles import *
-from personal_finance import *
-from stock_recommendation import *
+from stocks_consulting_app import *
+from yahoo_articles_app import *
+from personal_finance_app import *
+from stock_recommendation_app import *
 import streamlit as st
 import nltk
 import random

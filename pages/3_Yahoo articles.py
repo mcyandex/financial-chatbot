@@ -1,7 +1,7 @@
 import streamlit as st
 from transformers import pipeline
 import random
-from yahoo_articles import *
+from yahoo_articles_app import *
 
 
 st.title("Personal Finance Advice")

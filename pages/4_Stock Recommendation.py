@@ -1,7 +1,7 @@
 import streamlit as st
 from transformers import pipeline
 import random
-from stock_recommendation import *
+from stock_recommendation_app import *
 
 
 st.title("Investing Recommendation")
